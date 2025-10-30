@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 
-def setup_logger(name: str = "gpu_dashboard", level: str = "INFO") -> logging.Logger:
+def setup_logger(name: str = "ai_sw_ide", level: str = "INFO") -> logging.Logger:
     """
     Configure logger for AI_SW_IDE application
     
@@ -45,7 +45,7 @@ def setup_logger(name: str = "gpu_dashboard", level: str = "INFO") -> logging.Lo
         log_dir.mkdir(exist_ok=True)
         
         file_handler = RotatingFileHandler(
-            log_dir / "gpu_dashboard.log",
+            log_dir / "ai_sw_ide.log",
             maxBytes=10*1024*1024,  # 10MB
             backupCount=5
         )
