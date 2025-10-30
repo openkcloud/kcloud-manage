@@ -25,3 +25,16 @@ class Flavor(Base):
     worker_node = Column(String, nullable=False)
     gpu_id = Column(Integer, nullable=False)
     mig_id = Column(Integer, nullable=False)
+
+
+class ServerGpuMapping(Base):
+    __tablename__ = "server_gpu_mapping"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    server_id = Column(Integer, ForeignKey("servers.id"), nullable=False)
+    gpu_id = Column(Integer, ForeignKey("gpu_flavor.id"), nullable=False)
+    
+    # setting relationship
+    server = relationship("PodCreation", foreign_keys=[server_id])
+    gpu_flavor = relationship("Flavor", foreign_keys=[gpu_id])
+    
