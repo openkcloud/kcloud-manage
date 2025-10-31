@@ -19,21 +19,21 @@ from app.db.fetch_gpu import sync_flavors_to_db, sync_gpu_pod_status_from_promet
 from app.core.logger import app_logger
 
 async def scheduled_sync_gpu_flavors():
-    """30초마다 실행되는 GPU 플레이버 동기화 작업"""
+    """GPU flavor synchronization task that runs every 30 seconds"""
     try:
-        await sync_flavors_to_db()  # gpu_flavor 테이블 동기화
-        await sync_gpu_pod_status_from_prometheus()  # servers 테이블 동기화
+        await sync_flavors_to_db()  # Synchronize gpu_flavor table
+        await sync_gpu_pod_status_from_prometheus()  # Synchronize servers table
     except Exception as e:
         app_logger.error(f"GPU sync error: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 개발 환경에서 테이블 자동 생성 (프로덕션에서는 Alembic 등으로 관리)
+    # Auto-create tables in development (use Alembic etc. for production management)
     Base.metadata.create_all(bind=engine)
     init_users_from_csv("./app/db/default_users.csv")
     init_flavors_from_csv("./app/db/default_gpu_flavors.csv")
     
-    # APScheduler 시작
+    # Start APScheduler
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
         scheduled_sync_gpu_flavors, 
@@ -47,17 +47,17 @@ async def lifespan(app: FastAPI):
     
     yield
     
-    # 앱 종료 시 스케줄러 정리
+    # Cleanup scheduler on app shutdown
     scheduler.shutdown()
     app_logger.info("GPU sync scheduler stopped")
 
 app = FastAPI(lifespan=lifespan)
 
-# 로깅 간섭을 피하기 위해 미들웨어 제거
-# proxy 로그가 너무 많으면 uvicorn 시작 옵션으로 조정하세요:
+# Remove middleware to avoid logging interference
+# If proxy logs are too verbose, adjust with uvicorn startup options:
 # uvicorn app.main:app --log-level warning
 
-# CORS 미들웨어 설정 (개발 단계에서는 "*" 사용, 프로덕션에서는 허용할 도메인 명시)
+# CORS middleware configuration (use "*" in development, specify allowed domains in production)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -70,7 +70,7 @@ app.add_middleware(
 
 app.include_router(api_router)
 
-# kernelspecs 등의 static 파일을 위한 직접 라우터 등록
+# Register direct routers for static files like kernelspecs
 app.add_api_route("/kernelspecs/{path:path}", proxy_kernelspecs, methods=["GET"])
 app.add_api_route("/static/{path:path}", proxy_static_files, methods=["GET"])
 app.add_api_route("/nbextensions/{path:path}", proxy_nbextensions, methods=["GET"])
@@ -95,7 +95,7 @@ def custom_openapi():
             }
         }
     }
-    # 각 endpoint에 보안 설정을 추가합니다.
+    # Add security configuration to each endpoint
     for path in openapi_schema["paths"].values():
         for method in path.values():
             method.setdefault("security", []).append({"OAuth2Password": []})
@@ -107,5 +107,4 @@ app.openapi = custom_openapi
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the FastAPI application."}
-
 
