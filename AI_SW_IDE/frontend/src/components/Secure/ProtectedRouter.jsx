@@ -6,9 +6,9 @@ import { jwtDecode } from "jwt-decode"; // Changed import statement
 const isTokenValid = (token) => {
   try {
     const decoded = jwtDecode(token); // Remove .default
-    // 가짜 토큰인 경우 exp가 없으면 true 처리
+    // If it's a dummy token and has no exp, treat as valid
     if (!decoded.exp) return true;
-    return decoded.exp * 1000 > Date.now(); // exp는 초 단위, Date.now()는 밀리초
+    return decoded.exp * 1000 > Date.now(); // exp is in seconds, Date.now() is in milliseconds
   } catch (err) {
     console.error("JWT decode error:", err);
     return false;
