@@ -78,8 +78,12 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 각 서비스는 FastAPI의 자동 생성 문서를 제공합니다:
 
-- Backend API: `http://localhost:8000/docs`
-- Data Observer API: `http://localhost:8001/docs`
+- Backend API: `http://<node-ip>:<backend-nodeport>/docs`
+  (NodePort 확인: `kubectl get svc -n ai-sw-ide`)
+- Data Observer API: 
+    kubectl port-forward -n ai-sw-ide svc/ai-sw-ide-data-observer 8001:8000
+    http://localhost:8001/docs 에서 API 문서 확인
+
 
 ## 환경 설정
 
