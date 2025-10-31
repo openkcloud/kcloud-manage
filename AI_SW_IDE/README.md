@@ -1,11 +1,11 @@
-# GPU Dashboard
+# AI SOFTWARE IDE
 
 GPU 리소스 모니터링 및 관리를 위한 대시보드 애플리케이션입니다.
 
 ## 프로젝트 구조
 
 ```
-gpu_dashboard/
+AI_SW_IDE/
 ├── backend/           # FastAPI 백엔드 서버
 ├── frontend/          # React 프론트엔드 애플리케이션
 ├── data_observer/     # NFS 데이터 모니터링 서비스

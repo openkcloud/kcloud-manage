@@ -179,10 +179,10 @@ export function SignInPage() {
           AI SOFTWARE IDE
         </Typography>
         <Typography variant="h3" className="mb-6 text-4xl font-bold text-blue-700">
-          DCP GPU Dashboard!
+          AI SOFTWARE IDE!
         </Typography>
         <Typography className="mb-20 text-white leading-loose">
-          AI_SW_IDE는 사용 중인 GPU 자원을 실시간으로 모니터링하고, 사용 가능한 GPU 서버를 직접 배포하실 수 있는 웹 페이지입니다.
+          AI SOFTWARE IDE는 사용 중인 GPU 자원을 실시간으로 모니터링하고, 사용 가능한 GPU 서버를 직접 배포하실 수 있는 웹 페이지입니다.
           GPU의 사용량, 메모리 상태 등을 한눈에 확인하실 수 있으며, 원하는 설정에 맞춰 새로운 GPU 서버를 손쉽게 생성하실 수 있어 연구나 개발 환경에서
           자원을 보다 효율적으로 관리하고 활용하실 수 있습니다.
         </Typography>

@@ -1,4 +1,4 @@
-# GPU Dashboard Frontend
+# AI SOFTWARE IDE Frontend
 
 GPU 클러스터 관리를 위한 웹 대시보드의 프론트엔드 애플리케이션입니다. React와 Material Tailwind를 기반으로 구축되었으며, GPU 서버 생성, 모니터링, 스토리지 관리 등의 기능을 제공합니다.
 
