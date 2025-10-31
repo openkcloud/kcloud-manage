@@ -68,7 +68,7 @@ npm install
 npm run dev
 ```
 
-### Data Observer 개발
+### Data Observer Development
 ```bash
 cd data_observer
 pip install -r requirements.txt
