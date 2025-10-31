@@ -2,7 +2,7 @@
 import sys
 import os
 
-# 현재 경로를 Python path에 추가
+# Add current path to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from app.models.gpu import ServerGpuMapping, Flavor
@@ -11,23 +11,23 @@ from app.models.user import User
 from app.db.session import SessionLocal
 
 def create_test_mapping():
-    """사용자가 제공한 데이터에 맞는 테스트 매핑을 생성합니다."""
+    """Generate test mappings based on user-provided data."""
     db = SessionLocal()
     try:
-        # 기존 데이터 확인
+        # Check existing data
         servers = db.query(PodCreation).all()
         flavors = db.query(Flavor).all()
         users = db.query(User).all()
         
-        print(f"서버 개수: {len(servers)}")
-        print(f"GPU Flavor 개수: {len(flavors)}")
-        print(f"사용자 개수: {len(users)}")
+        print(f"Server count: {len(servers)}")
+        print(f"GPU Flavor count: {len(flavors)}")
+        print(f"User count: {len(users)}")
         
-        # 기존 매핑 삭제
+        # Delete existing mappings
         db.query(ServerGpuMapping).delete()
-        print("기존 매핑 데이터 삭제 완료")
+        print("Existing mapping data deleted")
         
-        # 사용자 데이터에 맞는 매핑 생성
+        # Create mappings based on user data
         # server_id | gpu_id
         # ----------+--------
         #    12     | 120
@@ -46,7 +46,7 @@ def create_test_mapping():
         
         created_count = 0
         for server_id, gpu_flavor_id in test_mappings:
-            # 서버와 GPU가 실제로 존재하는지 확인
+            # Check if server and GPU actually exist
             server = db.query(PodCreation).filter(PodCreation.id == server_id).first()
             flavor = db.query(Flavor).filter(Flavor.id == gpu_flavor_id).first()
             
@@ -54,20 +54,20 @@ def create_test_mapping():
                 mapping = ServerGpuMapping(server_id=server_id, gpu_id=gpu_flavor_id)
                 db.add(mapping)
                 created_count += 1
-                print(f"매핑 생성: server_id={server_id} ({server.pod_name}) -> gpu_id={gpu_flavor_id} ({flavor.gpu_name})")
+                print(f"Mapping created: server_id={server_id} ({server.pod_name}) -> gpu_id={gpu_flavor_id} ({flavor.gpu_name})")
             else:
-                print(f"매핑 실패: server_id={server_id} 또는 gpu_id={gpu_flavor_id}가 존재하지 않음")
+                print(f"Mapping failed: server_id={server_id} or gpu_id={gpu_flavor_id} does not exist")
                 if not server:
-                    print(f"  - 서버 {server_id}를 찾을 수 없음")
+                    print(f"  - Server {server_id} not found")
                 if not flavor:
-                    print(f"  - GPU Flavor {gpu_flavor_id}를 찾을 수 없음")
+                    print(f"  - GPU Flavor {gpu_flavor_id} not found")
         
         db.commit()
-        print(f"\n총 {created_count}개의 매핑이 생성되었습니다.")
+        print(f"\nTotal {created_count} mappings created.")
         
-        # 결과 확인
+        # Verify results
         mappings = db.query(ServerGpuMapping).all()
-        print(f"\n=== 최종 매핑 결과 ({len(mappings)}개) ===")
+        print(f"\n=== Final Mapping Results ({len(mappings)} items) ===")
         for mapping in mappings:
             server = db.query(PodCreation).filter(PodCreation.id == mapping.server_id).first()
             flavor = db.query(Flavor).filter(Flavor.id == mapping.gpu_id).first()
@@ -78,7 +78,7 @@ def create_test_mapping():
                 print(f"server_id: {mapping.server_id} ({server.pod_name}) -> gpu_id: {mapping.gpu_id} ({flavor.gpu_name}) - User: {user_name}")
             
     except Exception as e:
-        print(f"오류 발생: {e}")
+        print(f"Error occurred: {e}")
         import traceback
         traceback.print_exc()
         db.rollback()

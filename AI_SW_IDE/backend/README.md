@@ -1,55 +1,55 @@
 # AI SOFTWARE IDE Backend
 
-GPU 클러스터 관리를 위한 FastAPI 기반 백엔드 서비스입니다. Kubernetes 환경에서 GPU 리소스를 할당하고 관리하며, Jupyter Lab 서버를 동적으로 생성/삭제할 수 있는 기능을 제공합니다.
+FastAPI-based backend service for GPU cluster management. Provides functionality to allocate and manage GPU resources in a Kubernetes environment and dynamically create/delete Jupyter Lab servers.
 
-## 🚀 주요 기능
+## 🚀 Key Features
 
-- **서버 관리**: Kubernetes Pod 기반 Jupyter Lab 서버 생성/삭제
-- **GPU 리소스 관리**: MIG(Multi-Instance GPU) 및 전체 GPU 할당
-- **스토리지 관리**: PVC(PersistentVolumeClaim) 및 NFS 마운트 지원
-- **사용자 인증**: JWT 기반 사용자 인증 및 권한 관리
-- **메트릭 수집**: GPU 및 노드 리소스 모니터링
-- **프록시 서버**: Jupyter Lab 서버 접근을 위한 내부 프록시
-- **파일 브라우징**: 외부 data-observer 서비스와 연동
+- **Server Management**: Create/delete Kubernetes Pod-based Jupyter Lab servers
+- **GPU Resource Management**: MIG (Multi-Instance GPU) and full GPU allocation
+- **Storage Management**: PVC (PersistentVolumeClaim) and NFS mount support
+- **User Authentication**: JWT-based user authentication and authorization
+- **Metrics Collection**: GPU and node resource monitoring
+- **Proxy Server**: Internal proxy for Jupyter Lab server access
+- **File Browsing**: Integration with external data-observer service
 
-## 📁 프로젝트 구조
+## 📁 Project Structure
 
 ```
 backend/
 ├── app/
-│   ├── main.py                 # FastAPI 애플리케이션 진입점
-│   ├── test.py                 # 테스트 파일
-│   ├── api/                    # API 라우터 및 엔드포인트
-│   │   ├── router.py           # 메인 라우터 설정
+│   ├── main.py                 # FastAPI application entry point
+│   ├── test.py                 # Test file
+│   ├── api/                    # API router and endpoints
+│   │   ├── router.py           # Main router configuration
 │   │   └── routes/            
-│   │       ├── auth.py         # 사용자 인증 관련 API
-│   │       ├── server.py       # 서버(Pod) 관리 API
-│   │       ├── storage.py      # 스토리지(PVC) 관리 API
-│   │       ├── proxy.py        # Jupyter Lab 프록시 API
-│   │       └── metrics.py      # 메트릭 수집 API
-│   ├── core/                   # 핵심 설정
-│   │   └── config.py           # 환경 설정 및 Kubernetes 클라이언트
-│   ├── db/                     # 데이터베이스 관련
-│   │   ├── session.py          # SQLAlchemy 세션 설정
-│   │   ├── dependencies.py     # DB 의존성 주입
-│   │   └── init_database.py    # 초기 데이터 로딩
-│   ├── models/                 # SQLAlchemy 모델
-│   │   ├── user.py             # 사용자 모델
-│   │   ├── gpu.py              # GPU 및 Flavor 모델
-│   │   └── k8s.py              # Kubernetes 리소스 모델
-│   ├── schemas/                # Pydantic 스키마
-│   │   ├── k8s.py              # Kubernetes 관련 스키마
-│   │   └── login.py            # 인증 관련 스키마
-│   └── utils/                  # 유틸리티 함수
-│       └── __init__.py         # 공통 유틸리티 함수
-├── requirements.txt            # Python 의존성
-├── local.env                   # 로컬 환경 변수
-├── prod.env                    # 프로덕션 환경 변수
-├── create_test_mapping.py      # 테스트 데이터 생성 스크립트
-└── Dockerfile                  # Docker 이미지 빌드 파일
+│   │       ├── auth.py         # User authentication API
+│   │       ├── server.py       # Server (Pod) management API
+│   │       ├── storage.py      # Storage (PVC) management API
+│   │       ├── proxy.py        # Jupyter Lab proxy API
+│   │       └── metrics.py      # Metrics collection API
+│   ├── core/                   # Core configuration
+│   │   └── config.py           # Environment settings and Kubernetes client
+│   ├── db/                     # Database related
+│   │   ├── session.py          # SQLAlchemy session configuration
+│   │   ├── dependencies.py     # DB dependency injection
+│   │   └── init_database.py    # Initial data loading
+│   ├── models/                 # SQLAlchemy models
+│   │   ├── user.py             # User model
+│   │   ├── gpu.py              # GPU and Flavor models
+│   │   └── k8s.py              # Kubernetes resource models
+│   ├── schemas/                # Pydantic schemas
+│   │   ├── k8s.py              # Kubernetes related schemas
+│   │   └── login.py            # Authentication related schemas
+│   └── utils/                  # Utility functions
+│       └── __init__.py         # Common utility functions
+├── requirements.txt            # Python dependencies
+├── local.env                   # Local environment variables
+├── prod.env                    # Production environment variables
+├── create_test_mapping.py      # Test data generation script
+└── Dockerfile                  # Docker image build file
 ```
 
-## 🛠️ 기술 스택
+## 🛠️ Tech Stack
 
 - **Framework**: FastAPI
 - **Database**: PostgreSQL with SQLAlchemy ORM
@@ -59,106 +59,106 @@ backend/
 - **Environment Management**: python-dotenv
 - **Real-time Communication**: WebSockets
 
-## 📋 주요 API 엔드포인트
+## 📋 Main API Endpoints
 
-### 🔐 인증 (`/auth`)
-- `POST /auth/login` - 사용자 로그인
-- `POST /auth/refresh` - 토큰 갱신
+### 🔐 Authentication (`/auth`)
+- `POST /auth/login` - User login
+- `POST /auth/refresh` - Token refresh
 
-### 🖥️ 서버 관리 (`/server`)
-- `GET /server/list` - 전체 서버 목록 조회
-- `GET /server/my-server` - 내 서버 목록 조회
-- `GET /server/my-pvcs` - 내 PVC 목록 조회
-- `POST /server/create-pod` - 새 서버(Pod) 생성
-- `DELETE /server/delete-server` - 서버 삭제
-- `GET /server/browse` - 파일 브라우징 (data-observer 연동)
+### 🖥️ Server Management (`/server`)
+- `GET /server/list` - List all servers
+- `GET /server/my-server` - List my servers
+- `GET /server/my-pvcs` - List my PVCs
+- `POST /server/create-pod` - Create new server (Pod)
+- `DELETE /server/delete-server` - Delete server
+- `GET /server/browse` - File browsing (data-observer integration)
 
-### 💾 스토리지 관리 (`/storage`)
-- `GET /storage/storage-list` - 내 스토리지 목록 조회
-- `POST /storage/create-nfs-storage` - NFS 기반 PV/PVC 생성
-- `DELETE /storage/storage` - 스토리지 삭제
+### 💾 Storage Management (`/storage`)
+- `GET /storage/storage-list` - List my storage
+- `POST /storage/create-nfs-storage` - Create NFS-based PV/PVC
+- `DELETE /storage/storage` - Delete storage
 
-### 📊 메트릭 (`/metrics`)
-- `GET /metrics/gpu-metrics` - GPU 사용률 조회
-- `GET /metrics/node-metrics` - 노드 리소스 조회
+### 📊 Metrics (`/metrics`)
+- `GET /metrics/gpu-metrics` - Get GPU usage
+- `GET /metrics/node-metrics` - Get node resources
 
-### 🔗 프록시 (`/proxy`)
-- `GET /proxy/{server_id}/` - Jupyter Lab 프록시 접근
-- WebSocket 및 정적 파일 프록시 지원
+### 🔗 Proxy (`/proxy`)
+- `GET /proxy/{server_id}/` - Jupyter Lab proxy access
+- WebSocket and static file proxy support
 
-## 🔧 설치 및 실행
+## 🔧 Installation and Execution
 
-### 1. 의존성 설치
+### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. 환경 변수 설정
-`local.env` 또는 `prod.env` 파일을 참조하여 환경 변수를 설정합니다:
-- `DATABASE_URL`: PostgreSQL 연결 URL
-- `SECRET_KEY`: JWT 서명용 비밀키
-- `NAMESPACE`: Kubernetes 네임스페이스
-- 기타 Kubernetes 및 서비스 설정
+### 2. Configure Environment Variables
+Set environment variables by referring to `local.env` or `prod.env` files:
+- `DATABASE_URL`: PostgreSQL connection URL
+- `SECRET_KEY`: Secret key for JWT signing
+- `NAMESPACE`: Kubernetes namespace
+- Other Kubernetes and service settings
 
-### 3. 데이터베이스 초기화
+### 3. Initialize Database
 ```bash
-python create_test_mapping.py  # 테스트 데이터 생성 (선택사항)
+python create_test_mapping.py  # Generate test data (optional)
 ```
 
-### 4. 애플리케이션 실행
+### 4. Run Application
 ```bash
-# 개발 모드
+# Development mode
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-# 프로덕션 모드
+# Production mode
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-## 🐳 Docker 실행
+## 🐳 Docker Execution
 
 ```bash
-# Docker 이미지 빌드
+# Build Docker image
 docker build -t ai-sw-ide-backend .
 
-# 컨테이너 실행
+# Run container
 docker run -p 8000:8000 --env-file prod.env ai-sw-ide-backend
 ```
 
-## 🎯 주요 특징
+## 🎯 Key Features
 
-### GPU 리소스 관리
-- **MIG 지원**: A100 GPU의 Multi-Instance GPU 기능 활용
-- **동적 할당**: 사용자 요청에 따른 GPU 리소스 실시간 할당
-- **리소스 추적**: GPU 사용률 및 가용성 모니터링
+### GPU Resource Management
+- **MIG Support**: Utilize Multi-Instance GPU functionality of A100 GPUs
+- **Dynamic Allocation**: Real-time GPU resource allocation based on user requests
+- **Resource Tracking**: Monitor GPU usage and availability
 
-### Kubernetes 통합
-- **네이티브 지원**: Kubernetes Python Client를 통한 직접 제어
-- **자동 정리**: 실패한 리소스 자동 정리 및 롤백
-- **네임스페이스 격리**: 멀티 테넌트 환경 지원
+### Kubernetes Integration
+- **Native Support**: Direct control via Kubernetes Python Client
+- **Auto Cleanup**: Automatic cleanup and rollback of failed resources
+- **Namespace Isolation**: Multi-tenant environment support
 
-### 스토리지 유연성
-- **PVC 관리**: 동적 PersistentVolumeClaim 생성/삭제
-- **NFS 지원**: 외부 NFS 서버 마운트 기능
-- **사용자별 격리**: 사용자별 스토리지 리소스 분리
+### Storage Flexibility
+- **PVC Management**: Dynamic PersistentVolumeClaim creation/deletion
+- **NFS Support**: External NFS server mount functionality
+- **Per-User Isolation**: Separate storage resources per user
 
-### 보안
-- **JWT 인증**: 토큰 기반 stateless 인증
-- **사용자 권한**: 리소스별 소유권 검증
-- **CORS 지원**: 프론트엔드 연동을 위한 CORS 설정
+### Security
+- **JWT Authentication**: Token-based stateless authentication
+- **User Permissions**: Resource ownership verification
+- **CORS Support**: CORS configuration for frontend integration
 
-## 🔗 연관 서비스
+## 🔗 Related Services
 
-- **Frontend**: React 기반 웹 대시보드
-- **Data Observer**: 파일 시스템 브라우징 서비스
-- **Jupyter Hub**: 사용자 개발 환경 제공
+- **Frontend**: React-based web dashboard
+- **Data Observer**: File system browsing service
+- **Jupyter Hub**: User development environment
 
-## 📝 API 문서
+## 📝 API Documentation
 
-애플리케이션 실행 후 다음 URL에서 자동 생성된 API 문서를 확인할 수 있습니다:
+After running the application, you can check the auto-generated API documentation at:
 - Swagger UI: `http://<NODE-IP>:<NODEPORT>/docs`
 - ReDoc: `http://<NODE-IP>:<NODEPORT>/redoc`
 
-## 🤝 기여
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -166,6 +166,6 @@ docker run -p 8000:8000 --env-file prod.env ai-sw-ide-backend
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 라이선스
+## 📄 License
 
-이 프로젝트는 [Apache 2.0 라이선스](LICENSE) 하에 배포됩니다. 
+This project is released under the [Apache 2.0 License](LICENSE). 

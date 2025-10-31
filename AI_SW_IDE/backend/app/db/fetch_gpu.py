@@ -29,7 +29,7 @@ async def fetch_gpu_status_from_prometheus():
         metric = item["metric"]
         worker_node = metric.get("Hostname")
         gpu_id = int(metric.get("gpu", 0))
-        # MIG 인스턴스
+        # MIG instance
         if "GPU_I_PROFILE" in metric:
             gpu_name = metric["GPU_I_PROFILE"]
             mig_id = int(metric.get("GPU_I_ID", None))
@@ -48,7 +48,7 @@ async def fetch_gpu_status_from_prometheus():
 
 async def get_cpu_memory_from_k8s(pod_name, namespace=None):
     """
-    pod_name과 (선택적으로) namespace를 받아 해당 pod의 cpu, memory limit를 반환합니다.
+    Receive pod_name and (optionally) namespace, and return the pod's CPU and memory limits.
     """
     try:
         if namespace is None:
@@ -64,12 +64,12 @@ async def get_cpu_memory_from_k8s(pod_name, namespace=None):
         
         return cpu, memory
     except Exception as e:
-        app_logger.error(f"Pod {pod_name}의 CPU/Memory 정보를 가져오는 중 오류: {e}")
+        app_logger.error(f"Error while fetching CPU/Memory information for Pod {pod_name}: {e}")
         return "N/A", "N/A"
 
 async def get_pod_internal_ip(pod_name, namespace=None):
     """
-    pod_name과 (선택적으로) namespace를 받아 해당 pod의 internal IP를 반환합니다.
+    Receive pod_name and (optionally) namespace, and return the pod's internal IP.
     """
     try:
         if namespace is None:
@@ -87,7 +87,7 @@ async def sync_flavors_to_db():
     db: Session = SessionLocal()
     try:
         # 1. Extract all GPU information from Prometheus
-        prometheus_flavors = await fetch_gpu_status_from_prometheus()  # {(worker_node, gpu_id, gpu_name): 0}
+        prometheus_flavors = await fetch_gpu_status_from_prometheus()  # {(worker_node, gpu_id, mig_id, gpu_name): 0}
         # 2. Extract used GPUs from k8s
         # used_gpus = await fetch_used_gpus_from_k8s()  # set of (worker_node, gpu_id)
         # # 3. Mark used GPUs as available=1
@@ -104,11 +104,11 @@ async def sync_flavors_to_db():
             return (
                 str(worker_node).strip().lower() if worker_node else "",
                 int(gpu_id) if gpu_id is not None else -1,
-                mig_id,  #Keep as is without conversion
+                mig_id,  # Keep as is without conversion
                 str(gpu_name).strip().lower() if gpu_name else ""
             )
 
-        # upsert
+        # Upsert
         for (worker_node, gpu_id, mig_id, gpu_name), available in prometheus_flavors.items():
             norm_key = normalize_key(worker_node, gpu_id, mig_id, gpu_name)
             flavor = db.query(Flavor).filter(
@@ -123,17 +123,17 @@ async def sync_flavors_to_db():
                 db.add(Flavor(
                     worker_node=norm_key[0],
                     gpu_id=norm_key[1],
-                    mig_id=norm_key[2], # Store mig_id as is
+                    mig_id=norm_key[2],  # Store mig_id as is
                     gpu_name=norm_key[3],
                     available=available
                 ))
 
-        # delete
-        db_flavor_keys = {normalize_key(f.worker_node, f.gpu_id, f.mig_id, f.gpu_name) for f in db_flavors} # Compare mig_id as is
+        # Delete
+        db_flavor_keys = {normalize_key(f.worker_node, f.gpu_id, f.mig_id, f.gpu_name) for f in db_flavors}  # Compare mig_id as is
         prometheus_keys = {normalize_key(*k) for k in prometheus_flavors.keys()}
 
         for flavor in db_flavors:
-            norm_key = normalize_key(flavor.worker_node, flavor.gpu_id, flavor.mig_id, flavor.gpu_name) # Compare mig_id as is
+            norm_key = normalize_key(flavor.worker_node, flavor.gpu_id, flavor.mig_id, flavor.gpu_name)  # Compare mig_id as is
             if norm_key not in prometheus_keys:
                 db.delete(flavor)
         db.commit()
@@ -142,7 +142,7 @@ async def sync_flavors_to_db():
         db.close()
 
 def extract_user_name_from_pod(pod_name):
-    # 예: jupyter-js-lee---a4b212d2 → js.lee
+    # Example: jupyter-js-lee---a4b212d2 → js.lee
     if pod_name.startswith("jupyter-"):
         parts = pod_name.split('-')
         if len(parts) >= 3:
@@ -229,14 +229,14 @@ async def sync_gpu_pod_status_from_prometheus():
                     user = db.query(User).filter(User.name == "dev").first()
                 user_id = user.id if user else None
 
-                # cpu, memory 정보 가져오기
+                # Get CPU and memory information
                 namespace = metric.get("exported_namespace") or metric.get("namespace") or "default"
                 cpu, memory = await get_cpu_memory_from_k8s(pod_name, namespace)
                 
-                # internal IP 가져오기
+                # Get internal IP
                 internal_ip = await get_pod_internal_ip(pod_name, namespace)
                 
-                # tags 결정
+                # Determine tags
                 if pod_name.startswith("jupyter-"):
                     tags = "JUPYTER"
                 elif pod_name.startswith("ailabserver-"):
@@ -244,7 +244,7 @@ async def sync_gpu_pod_status_from_prometheus():
                 else:
                     tags = "DEV"
 
-                # servers 테이블 upsert (LEGEND 태그가 아닌 경우만)
+                # Upsert servers table (only if not LEGEND tag)
                 server = db.query(PodCreation).filter(
                     PodCreation.pod_name == pod_name,
                     (PodCreation.tags != 'LEGEND') | (PodCreation.tags.is_(None))
@@ -256,19 +256,19 @@ async def sync_gpu_pod_status_from_prometheus():
                     server.memory = memory
                     if internal_ip:
                         server.internal_ip = internal_ip
-                    server.tags = tags  # 항상 태그 업데이트
+                    server.tags = tags  # Always update tags
                     if server.status != "Running":
                         server.status = "Running"
 
                 else:
-                    # LEGEND 태그인 서버가 이미 있는지 확인
+                    # Check if server with LEGEND tag already exists
                     existing_legend = db.query(PodCreation).filter(
                         PodCreation.pod_name == pod_name,
                         PodCreation.tags == 'LEGEND'
                     ).first()
                     
                     if not existing_legend:
-                        # LEGEND가 아니고 새로운 서버인 경우에만 생성
+                        # Create only if not LEGEND and is a new server
                         server = PodCreation(
                             user_id=user_id,
                             server_name=pod_name,
@@ -282,38 +282,38 @@ async def sync_gpu_pod_status_from_prometheus():
                             tags=tags
                         )
                         db.add(server)
-                        db.flush()  # server.id를 얻기 위해 flush
-                        pass  # 새 서버 생성됨
+                        db.flush()  # Flush to get server.id
+                        pass  # New server created
                     else:
-                        continue  # LEGEND 태그 서버는 건너뜀
+                        continue  # Skip LEGEND tag server
                         continue
 
-            # 서버-GPU 매핑 처리 (LEGEND가 아닌 경우만)
+            # Process server-GPU mapping (only if not LEGEND)
             if server:
-                # 기존 매핑 삭제
+                # Delete existing mappings
                 deleted_count = db.query(ServerGpuMapping).filter(ServerGpuMapping.server_id == server.id).delete()
                 
-                # 새로운 매핑 추가
+                # Add new mappings
                 mapping_count = 0
                 for worker_node, gpu_id, mig_id, gpu_name in pod_gpu_details[pod_name]:
 
                     
-                    # 정규화 함수를 외부에서 정의 (매번 새로 정의하지 않도록)
+                    # Define normalization function externally (to avoid redefining each time)
                     norm_worker_node = str(worker_node).strip().lower() if worker_node else ""
                     norm_gpu_id = int(gpu_id) if gpu_id is not None else -1
-                    norm_mig_id = mig_id  # mig_id는 None일 수 있음
+                    norm_mig_id = mig_id  # mig_id can be None
                     norm_gpu_name = str(gpu_name).strip().lower() if gpu_name else ""
                     
 
                     
-                    # gpu_flavor 테이블에서 해당 GPU 찾기
+                    # Find corresponding GPU in gpu_flavor table
                     query = db.query(Flavor).filter(
                         Flavor.worker_node == norm_worker_node,
                         Flavor.gpu_id == norm_gpu_id,
                         Flavor.gpu_name == norm_gpu_name
                     )
                     
-                    # mig_id 조건 추가 (None 처리 포함)
+                    # Add mig_id condition (including None handling)
                     if norm_mig_id is None:
                         query = query.filter(Flavor.mig_id.is_(None))
                     else:
@@ -322,14 +322,14 @@ async def sync_gpu_pod_status_from_prometheus():
                     gpu_flavor = query.first()
                     
                     if gpu_flavor:
-                        # 중복 체크
+                        # Check for duplicates
                         existing_mapping = db.query(ServerGpuMapping).filter(
                             ServerGpuMapping.server_id == server.id,
                             ServerGpuMapping.gpu_id == gpu_flavor.id
                         ).first()
                         
                         if not existing_mapping:
-                            # 매핑 추가
+                            # Add mapping
                             mapping = ServerGpuMapping(
                                 server_id=server.id,
                                 gpu_id=gpu_flavor.id
@@ -340,8 +340,9 @@ async def sync_gpu_pod_status_from_prometheus():
 
         db.commit()
     except Exception as e:
-        app_logger.error(f"sync_gpu_pod_status_from_prometheus 실행 중 오류: {e}")
+        app_logger.error(f"Error while executing sync_gpu_pod_status_from_prometheus: {e}")
         db.rollback()
         raise
     finally:
         db.close()
+

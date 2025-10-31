@@ -1,4 +1,4 @@
-# 1. React 앱 빌드
+# 1. Build React app
 FROM node:22 AS build
 WORKDIR /app
 COPY package.json .
@@ -6,7 +6,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# 2. Nginx를 사용해 정적 파일 서빙
+# 2. Serve static files using Nginx
 FROM nginx:latest
 
 # gettext-base for envsubst command
