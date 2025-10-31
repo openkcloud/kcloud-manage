@@ -1,16 +1,17 @@
-# kcloud-manage
-# AI_SW_IDE
+# GPU Dashboard
 
 GPU 리소스 모니터링 및 관리를 위한 대시보드 애플리케이션입니다.
 
 ## 프로젝트 구조
 
 ```
-AI_SW_IDE/
+gpu_dashboard/
 ├── backend/           # FastAPI 백엔드 서버
 ├── frontend/          # React 프론트엔드 애플리케이션
 ├── data_observer/     # NFS 데이터 모니터링 서비스
 ├── helm-chart/        # Kubernetes 배포용 Helm 차트
+├── backend0.1/        # 백엔드 이전 버전
+├── frontend1.0/       # 프론트엔드 이전 버전
 └── deploy.sh          # 기존 배포 스크립트
 ```
 
@@ -74,16 +75,12 @@ pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## API 문서
+###  API 문서
 
 각 서비스는 FastAPI의 자동 생성 문서를 제공합니다:
 
-- Backend API: `http://<node-ip>:<backend-nodeport>/docs`
-  (NodePort 확인: `kubectl get svc -n ai-sw-ide`)
-- Data Observer API: 
-    kubectl port-forward -n ai-sw-ide svc/ai-sw-ide-data-observer 8001:8000
-    http://localhost:8001/docs 에서 API 문서 확인
-
+- Backend API: `http://localhost:8000/docs`
+- Data Observer API: `http://localhost:8001/docs`
 
 ## 환경 설정
 
@@ -102,4 +99,4 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 ## 라이선스
 
-Apache 2.0
+Apache 2.0 License
