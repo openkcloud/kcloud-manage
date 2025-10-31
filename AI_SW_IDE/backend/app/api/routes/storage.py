@@ -12,6 +12,7 @@ from app.models.user import User
 
 from app.utils import get_current_user, delete_pvc, now_kst
 from app.db.dependencies import get_db
+from app.core.config import NAMESPACE, v1_api
 
 
 router = APIRouter()

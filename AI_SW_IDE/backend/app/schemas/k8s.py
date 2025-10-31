@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
-
+from app.core.config import NFS_ADDRESS
 
 class PodCreateRequest(BaseModel):
     image: str  
