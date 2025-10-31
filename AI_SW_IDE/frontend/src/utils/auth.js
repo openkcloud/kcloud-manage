@@ -6,8 +6,8 @@ export async function fetchWithAuth(url, options = {}) {
   const refreshToken = localStorage.getItem("refresh_token");
 
   if (!accessToken) {
-    console.warn("❌ access token 없음. 로그인 필요");
-    alert("로그인이 필요합니다.");
+    console.warn("❌ No access token. Login required");
+    alert("Login is required.");
     window.location.href = "/";
     return;
   }
@@ -34,7 +34,7 @@ export async function fetchWithAuth(url, options = {}) {
       accessToken = data.token;
       localStorage.setItem("access_token", accessToken);
 
-      // 재요청
+      // Retry request
       response = await fetch(`${API_URL}${url}`, {
         ...options,
         headers: {
@@ -46,7 +46,7 @@ export async function fetchWithAuth(url, options = {}) {
     } else {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+      alert("Session has expired. Please log in again.");
       window.location.href = "/";
       return;
     }
@@ -55,25 +55,25 @@ export async function fetchWithAuth(url, options = {}) {
   return response;
 }
 
-// 로그아웃 함수
+// Logout function
 export function logout() {
-  // localStorage에서 토큰 제거
+  // Remove tokens from localStorage
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
   
-  // 추가로 필요한 정리 작업이 있다면 여기에 추가
+  // Add any additional cleanup work needed here
   
-  // 로그인 페이지로 리다이렉트
+  // Redirect to login page
   window.location.href = "/";
 }
 
-// 로그인 상태 확인
+// Check login status
 export function isLoggedIn() {
   const accessToken = localStorage.getItem("access_token");
   return !!accessToken;
 }
 
-// 현재 사용자 정보 가져오기 (토큰에서 디코드)
+// Get current user information (decode from token)
 export function getCurrentUser() {
   const accessToken = localStorage.getItem("access_token");
   
@@ -82,17 +82,17 @@ export function getCurrentUser() {
   }
   
   try {
-    // JWT 토큰 디코드 (간단한 방법)
+    // Decode JWT token (simple method)
     const payload = JSON.parse(atob(accessToken.split('.')[1]));
     return {
-      username: payload.sub || payload.username || "사용자",
+      username: payload.sub || payload.username || "User",
       role: payload.role || "user",
       exp: payload.exp
     };
   } catch (error) {
-    console.error("토큰 디코드 실패:", error);
+    console.error("Token decode failed:", error);
     return {
-      username: "사용자",
+      username: "User",
       role: "user"
     };
   }
