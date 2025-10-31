@@ -11,12 +11,12 @@ const MyServer = () => {
       try {
         const res = await fetchWithAuth("/server/my-server");
         if (!res || !res.ok) {
-          throw new Error("서버에서 응답을 받을 수 없습니다.");
+          throw new Error("Unable to receive response from server.");
         }
         const data = await res.json();
         setServers(data);
       } catch (error) {
-        console.error("서버 목록 불러오기 실패:", error);
+        console.error("Failed to load server list:", error);
       }
     };
 
@@ -33,7 +33,7 @@ const MyServer = () => {
         <MyServerCard key={server.id} server={server} index={index} onDelete={handleDelete} />
       ))}
 
-      {/* 🔽 추가로 "빈 카드"도 렌더링 */}
+      {/* 🔽 Additionally render "empty card" */}
       <MyServerCard />
     </div>
   );
