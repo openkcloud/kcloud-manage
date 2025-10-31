@@ -176,7 +176,7 @@ export function SignInPage() {
           Welcome to
         </Typography>
         <Typography variant="h3" className="mb-2 text-4xl font-bold text-blue-700">
-          OKESTRO AI LAB
+          AI SOFTWARE IDE
         </Typography>
         <Typography variant="h3" className="mb-6 text-4xl font-bold text-blue-700">
           DCP GPU Dashboard!

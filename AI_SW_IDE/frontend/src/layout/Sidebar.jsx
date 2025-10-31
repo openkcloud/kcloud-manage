@@ -56,7 +56,7 @@ const Sidebar = () => {
           color="blue-gray"
           className="text-center"
         >
-          OKESTRO AI LAB
+          AI SOFTWARE IDE
         </Typography>
       </div>
 
