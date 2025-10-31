@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "backend.labels" . | nindent 4 }}
 data:
-  DATABASE_URL: "postgresql://<DB_USER>:<DB_PASSWORD>@{{ .Release.Name }}-postgresql:5432/<DB_NAME>"
+  DATABASE_URL: "postgresql://<DB_USER>:<DB_PASSWORD>@{{ .Release.Name }}-postgresql:5432/ai-sw-ide"
   NAMESPACE: {{ .Release.Namespace | quote }}
   PROMETHEUS_ADDRESS: {{ .Values.global.environment.services.prometheus | quote }}
   NODE_NAMES: {{ .Values.global.environment.nodes.workers | quote }}
