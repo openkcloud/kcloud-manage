@@ -18,7 +18,7 @@ function App() {
           path="/admin"
           element={
             <ProtectedRoute requiredRole="admin">
-              <AdminDashboard /> {/* 이건 레이아웃 */}
+              <AdminDashboard /> {/* This is Layout */}
             </ProtectedRoute>
           }
         >
