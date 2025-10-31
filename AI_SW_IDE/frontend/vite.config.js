@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'), // ✅ 'src' 디렉토리를 @로 지정
+      '@': path.resolve(__dirname, 'src'), // ✅ Set 'src' directory to @ alias
     },
   },
 });
