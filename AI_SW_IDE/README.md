@@ -32,6 +32,10 @@ AI_SW_IDE/
 - **Features**: NFS volume data monitoring and filesystem analysis
 - **Port**: 8000
 
+## Prerequisites
+- DCGM Exporter
+- Prometheus
+
 ## Kubernetes Deployment
 
 ### Using Helm Chart (Recommended)
