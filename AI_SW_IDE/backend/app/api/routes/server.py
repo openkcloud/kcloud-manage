@@ -14,6 +14,7 @@ from app.models.user import User
 from app.models.gpu import ServerGpuMapping, Flavor
 from app.schemas.k8s import EntireServerResponse, MyServerResponse, PodCreateRequest, DeleteRequest, PVCDropdownResponse, PVCListResponse, DeletePVCRequest
 from app.utils import get_current_user, get_bound_pv_name, delete_pvc, delete_pod, now_kst
+from app.core.config import NAMESPACE, v1_api, DATA_OBSERVER_URL
 
 router = APIRouter()
 
