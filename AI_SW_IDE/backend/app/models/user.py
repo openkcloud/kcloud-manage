@@ -13,4 +13,6 @@ class User(Base):
     role = Column(String, nullable=False, default="admin")
     name = Column(String, nullable=False)
     department = Column(String, nullable=False, default="AI LAB")
-    
+        
+    servers = relationship("PodCreation", back_populates="user", cascade="all, delete-orphan")
+    pvcs = relationship("PVC", back_populates="user", cascade="all, delete-orphan")
