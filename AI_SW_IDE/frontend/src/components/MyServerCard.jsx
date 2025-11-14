@@ -24,7 +24,7 @@ export function MyServerCard({ server, index, onDelete }) {
     return (
       <Card
         className="p-4 border-2 border-dashed border-blue-300 rounded-xl bg-white w-full flex items-center justify-center cursor-pointer hover:bg-blue-50"
-        onClick={() => navigate("/admin/create")} // 필요시 함수 연결
+        onClick={() => navigate("/admin/create")} // Connect function if needed
       >
         <Typography variant="h5" className="text-blue-400 text-lg font-semibold">
           + Create New Server
@@ -46,7 +46,7 @@ export function MyServerCard({ server, index, onDelete }) {
   console.log(server)
 
   const handleDelete = async () => {
-    const confirmed = window.confirm("정말로 이 서버를 삭제하시겠습니까?");
+    const confirmed = window.confirm("Are you sure you want to delete this server?");
     if (!confirmed) return;
 
     try {
@@ -59,20 +59,20 @@ export function MyServerCard({ server, index, onDelete }) {
        });
       console.log(podName)
       if (res.ok) {
-        alert("서버가 삭제되었습니다.");
-        onDelete?.(server.id); // ✅ 삭제 후 부모에게 알림
+        alert("Server has been deleted.");
+        onDelete?.(server.id); // ✅ Notify parent after deletion
       } else {
-        alert("서버 삭제에 실패했습니다.");
+        alert("Failed to delete server.");
       }
     } catch (err) {
-      console.error("삭제 에러:", err);
-      alert("삭제 중 오류 발생");
+      console.error("Delete error:", err);
+      alert("An error occurred during deletion");
     }
   };
 
   return (
     <Card className="p-4 shadow-lg border-2 border-blue-gray-900 rounded-xl bg-white w-full ">
-      {/* 상단 영역 */}
+      {/* Top area */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-2">
           <IconButton
@@ -151,10 +151,10 @@ export function MyServerCard({ server, index, onDelete }) {
             <div className="ml-4 text-slate-700">{gpu}</div>
           </div>
 
-          {/* Grafana 그래프 영역 */}
+          {/* Grafana graph area */}
           <div className="mt-4 border-t border-blue-gray-200 pt-4">
             <div className="w-full h-32 flex items-center justify-center bg-blue-gray-50 text-blue-gray-600 rounded">
-              Grafana Graph 연결
+              Connect Grafana Graph
             </div>
           </div>
         </div>
