@@ -2,7 +2,7 @@ import logging
 import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-
+from app.core.config import LOG_LEVEL
 
 
 def setup_logger(name: str = "gpu_dashboard", level: str = "INFO") -> logging.Logger:
