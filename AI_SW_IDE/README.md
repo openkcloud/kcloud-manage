@@ -4,7 +4,7 @@
 Dashboard application for GPU resource monitoring and management.
 
 
-## 프로젝트 구조
+## Project Structure
 
 ```
 AI_SW_IDE/
@@ -36,9 +36,9 @@ AI_SW_IDE/
 - DCGM Exporter
 - Prometheus
 
-## Kubernetes 배포
+## Kubernetes deployment
 
-### Helm Chart 사용 (Recommended)
+### using Helm Chart (Recommended)
 
 To deploy to a Kubernetes cluster, use the `helm-chart/` folder:
 
