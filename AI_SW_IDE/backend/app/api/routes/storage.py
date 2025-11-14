@@ -23,15 +23,15 @@ async def create_nfs_storage(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """NFS path를 받아서 PV와 PVC를 생성하고 DB에 추가"""
+    """Receive NFS path, create PV and PVC, and add to DB"""
     
-    # 고유한 PV, PVC 이름 생성
+    # Generate unique PV and PVC names
     unique_id = uuid.uuid4().hex[:8]
     pv_name = f"ailabserver-pv-{request.pvc_name}-{unique_id}"
     pvc_name = f"ailabserver-claim-{request.pvc_name}-{unique_id}"
     
     try:
-        # PV manifest 생성 (NFS)
+        # Create PV manifest (NFS)
         pv_manifest = {
             "apiVersion": "v1",
             "kind": "PersistentVolume",
@@ -56,7 +56,7 @@ async def create_nfs_storage(
             }
         }
         
-        # PVC manifest 생성
+        # Create PVC manifest
         pvc_manifest = {
             "apiVersion": "v1",
             "kind": "PersistentVolumeClaim", 
@@ -81,16 +81,16 @@ async def create_nfs_storage(
             }
         }
         
-        # PV 생성
+        # Create PV
         v1_api.create_persistent_volume(body=pv_manifest)
         
-        # PVC 생성 
+        # Create PVC
         v1_api.create_namespaced_persistent_volume_claim(
             namespace=NAMESPACE,
             body=pvc_manifest
         )
         
-        # DB에 PVC 정보 저장
+        # Save PVC information to DB
         pvc_obj = PVC(
             user_id=current_user.id,
             pvc_name=pvc_name,
@@ -104,7 +104,7 @@ async def create_nfs_storage(
         db.refresh(pvc_obj)
         
         return {
-            "message": "NFS PV/PVC가 성공적으로 생성되었습니다",
+            "message": "NFS PV/PVC created successfully",
             "pv_name": pv_name,
             "pvc_name": pvc_name,
             "nfs_path": request.nfs_path,
@@ -112,7 +112,7 @@ async def create_nfs_storage(
         }
         
     except ApiException as e:
-        # 생성 실패 시 정리
+        # Cleanup on creation failure
         try:
             v1_api.delete_namespaced_persistent_volume_claim(name=pvc_name, namespace=NAMESPACE)
             v1_api.delete_persistent_volume(name=pv_name)
@@ -123,7 +123,7 @@ async def create_nfs_storage(
             detail=f"Kubernetes PV/PVC 생성 실패: {e.body}"
         )
     except Exception as e:
-        # 생성 실패 시 정리
+        # Cleanup on creation failure
         try:
             v1_api.delete_namespaced_persistent_volume_claim(name=pvc_name, namespace=NAMESPACE)
             v1_api.delete_persistent_volume(name=pv_name)
@@ -131,7 +131,7 @@ async def create_nfs_storage(
             pass
         raise HTTPException(
             status_code=500,
-            detail=f"NFS 스토리지 생성 중 오류 발생: {str(e)}"
+            detail=f"Error occurred while creating NFS storage: {str(e)}"
         )
 
 @router.get("/storage-list", response_model=List[PVCResponse])
