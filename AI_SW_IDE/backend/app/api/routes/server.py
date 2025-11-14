@@ -21,35 +21,35 @@ router = APIRouter()
 @router.get("/browse")
 def browse_files(path: str = "/"):
     """
-    path를 받아서 data-observer-service에 전달하고 결과를 반환하는 엔드포인트
+    Endpoint that receives a path, forwards it to data-observer-service, and returns the result
     """
     try:
-        # 외부 서비스 URL 구성
+        # Construct external service URL
         base_url = f"{DATA_OBSERVER_URL}/browse"
         
         params = {"path": "/"+"/".join(path.split('/')[2:])}
         app_logger.debug(f"Server creation params: {params}")
         
-        # 외부 서비스에 요청
+        # Request to external service
         response = requests.get(base_url, params=params, timeout=20)
         response.raise_for_status()
         
-        # JSON 응답인지 확인하고 반환
+        # Check if response is JSON and return
         try:
             return response.json()
         except ValueError:
-            # JSON이 아닌 경우 텍스트로 반환
+            # Return as text if not JSON
             return {"data": response.text}
             
     except requests.exceptions.RequestException as e:
         raise HTTPException(
             status_code=500,
-            detail=f"외부 서비스 호출 실패: {str(e)}"
+            detail=f"External service call failed: {str(e)}"
         )
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"파일 브라우징 중 오류 발생: {str(e)}"
+            detail=f"Error occurred while browsing files: {str(e)}"
         )
 
 @router.get("/list", response_model=list[EntireServerResponse])
@@ -61,7 +61,7 @@ def get_servers(db: Session = Depends(get_db)):
 
     response = []
     for pod in pods:
-        # 해당 서버의 GPU 매핑 정보 가져오기
+        # Get GPU mapping information for this server
         gpu_mappings = (
             db.query(ServerGpuMapping, Flavor)
             .join(Flavor, ServerGpuMapping.gpu_id == Flavor.id)
@@ -69,7 +69,7 @@ def get_servers(db: Session = Depends(get_db)):
             .all()
         )
         
-        # 노드 정보 생성 (worker_node [gpu_id, mig_id] 형식)
+        # Generate node information (format: worker_node [gpu_id, mig_id])
         node_info = []
         for mapping, flavor in gpu_mappings:
             if flavor.mig_id is not None:
@@ -77,7 +77,7 @@ def get_servers(db: Session = Depends(get_db)):
             else:
                 node_info.append(f"{flavor.worker_node} [{flavor.gpu_id}]")
         
-        # 노드 정보가 없으면 기본값 사용
+        # Use default value if no node information
         if not node_info:
             node_info = ["None"]
         
@@ -127,7 +127,7 @@ def get_my_pvcs(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """사용자의 PVC 목록을 드롭다운용으로 반환"""
+    """Return user's PVC list for dropdown"""
     pvcs = (
         db.query(PVC)
         .filter(PVC.user_id == current_user.id)
@@ -170,7 +170,7 @@ def delete_server(
         raise HTTPException(status_code=404, detail="Server not found or not authorized")
 
     try:
-        # 1. 먼저 해당 서버에 연결된 GPU들의 available을 0으로 설정 (GPU 해제)
+        # 1. First, set available to 0 for GPUs connected to this server (release GPU)
         gpu_mappings = db.query(ServerGpuMapping).filter(ServerGpuMapping.server_id == pod.id).all()
         for mapping in gpu_mappings:
             gpu_flavor = db.query(Flavor).filter(Flavor.id == mapping.gpu_id).first()
@@ -178,7 +178,7 @@ def delete_server(
                 gpu_flavor.available = 0
         db.flush()
         
-        # 2. server_gpu_mapping 테이블에서 관련 레코드 삭제
+        # 2. Delete related records from server_gpu_mapping table
         db.query(ServerGpuMapping).filter(ServerGpuMapping.server_id == pod.id).delete()
         db.flush()
         
@@ -211,17 +211,17 @@ def create_pod(
     }
     pod_created=False
     existing_pvc = True
-    # 고유한 pod 이름 생성
+    # Generate unique pod name
     name = f"{request.name.replace(' ', '-')}-{uuid.uuid4().hex[:6]}"
     pod_name = f"ailabserver-{name}"
     print(f"request : {request}")
 
-    # 기존에 있던 pvc라는 변수 이름을 대체할 수 있는 추천 이름은 `existing_persistent_volume_claim`입니다.
+    # Recommended alternative name for the existing pvc variable is `existing_persistent_volume_claim`.
     if request.pvc:
         existing_pvc = False
         pvc_name = f"ailabserver-claim-{name}"
 
-        # PVC manifest 생성
+        # Create PVC manifest
         pvc_manifest = {
             "apiVersion": "v1",
             "kind": "PersistentVolumeClaim",
@@ -253,7 +253,7 @@ def create_pod(
                 
                 raise HTTPException(
                     status_code=500,
-                    detail=f"PVC DB 저장 실패: {str(e)}"
+                    detail=f"Failed to save PVC to DB: {str(e)}"
                 )
         except ApiException as e:
             raise HTTPException(status_code=e.status, detail=f"PVC creation failed: {e.body}")
@@ -269,7 +269,7 @@ def create_pod(
         if pvc_obj.pvc_name != pvc_name:
             raise HTTPException(status_code=404, detail="PVC not found")
     
-    # Pod manifest 생성
+    # Create Pod manifest
     cpu = ''.join(re.findall(r'\d+', request.cpu))
     memory = ''.join(re.findall(r'\d+', request.memory)) + 'Gi'
     pod_manifest = {
@@ -321,7 +321,7 @@ def create_pod(
             body=pod_manifest
         )
         
-        # DB에 Pod 생성 기록 저장
+        # Save Pod creation record to DB
         pod_record = PodCreation(
             user_id=current_user.id,
             description=request.description,
