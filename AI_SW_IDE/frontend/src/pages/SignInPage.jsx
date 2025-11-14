@@ -188,7 +188,7 @@ export function SignInPage() {
         <Typography className="mb-10 text-white">
           <strong className="underline">Created by</strong>
           <br />
-          Okestro &gt; AI Research Institute &gt; AI Application Team &gt; AI Application Part &gt; <strong className="text-blue-300">yb.jo</strong>
+          Okestro &gt; <strong className="text-blue-300">yb.jo</strong>
         </Typography>
 
         <div className="flex items-center gap-2 text-white">
