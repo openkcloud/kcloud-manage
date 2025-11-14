@@ -7,7 +7,7 @@ data:
   DATABASE_URL: "postgresql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>"
   NAMESPACE: "gpu-dashboard"
   PROMETHEUS_ADDRESS: "<YOUR_PROMETHEUS_ADDRESS>"
-  NODE_NAMES: "<YOUR_ACTUAL_NODE_NAMES>(comma-separated: e.g. k8s-worker-1,k8s-worker-2)"
+  NODE_NAMES: "<YOUR_WORKER_NODE_NAMES>(comma-separated: e.g. k8s-worker-1,k8s-worker-2)"
   DATA_OBSERVER_URL: "<YOUR_DATAOBSERVER_SERVICE_URL>"
   CORS_ORIGINS: "<YOUR_FRONTEND_SERVICE_URL>"
   APP_PORT: "8000"
