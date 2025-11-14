@@ -33,10 +33,10 @@ def parse_gpu_data(raw_data: list[dict], db: Session):
             "status": "RUNNING" if pod_name else "EMPTY"
         }
 
-        # MIG일 경우 MIG 단위로 slot, 아닐 경우 GPU 전체
+        # For MIG: allocate by MIG slice; otherwise; allocate entier GPU
         if is_mig:
             result[node][gpu_id].append(slot_info)
         else:
-            result[node][gpu_id] = [slot_info]  # MIG 아님: 단일 슬롯
+            result[node][gpu_id] = [slot_info]  # non-MIG: single slot
 
     return result
