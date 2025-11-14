@@ -94,16 +94,16 @@ export function SignInPage() {
           GPU Dashboard!
         </Typography>
         <Typography className="mb-20 text-white leading-loose">
-          AI_SW_IDE는 사용 중인 GPU 자원을 실시간으로 모니터링하고, 사용 가능한 GPU 서버를 직접 배포하실 수 있는 웹 페이지입니다. 
-          GPU의 사용량, 메모리 상태 등을 한눈에 확인하실 수 있으며, 원하는 설정에 맞춰 새로운 GPU 서버를 손쉽게 생성할 수 있어 연구나 개발 환경에서 자원을 보다 효율적으로 관리하고 활용하실 수 있습니다.
+          AI SOFTWARE IDE is a web page that monitors GPU resources in real-time and allows you to directly deploy available GPU servers. 
+          You can check GPU usage and memory status at a glance, and easily create new GPU servers with your desired settings, enabling more efficient management and utilization of resources in research or development environments.
         </Typography>
         <Typography className="mb-10 text-white">
-          <strong className="underline">만든이 및 관리</strong>
-          <br />오케스트로 &gt; 인공지능연구소 &gt; AI응용팀 &gt; AI응용파트 &gt; <strong className="text-blue-300">yb.jo</strong>
+          <strong className="underline">Created by</strong>
+          <br />Okestro &gt; AI Research Institute &gt; AI Application Team&gt; AI Application Part &gt; <strong className="text-blue-300">yb.jo</strong>
         </Typography>
 
         <div className="flex items-center gap-2 text-white">
-          <span className="text-yellow-400 text-xl">★★★★★★★★</span>
+          <span className="text-yellow-400 text-xl"></span>
           <Typography>OpenKcloud</Typography>
         </div>
       </div>
