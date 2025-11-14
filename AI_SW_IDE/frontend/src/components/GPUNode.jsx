@@ -3,7 +3,7 @@ import GPUComponent from './GPUComponent';
 
 const GPUNode = ({ gpuId, data }) => {
   return (
-    // flex 컨테이너로 변경, 아이템 사이 간격을 위해 space-x-2 적용
+    // Changed to flex container, applied space-x-2 for spacing between items
     <div className="flex shadow-none">
       {data.map((item, index) => (
         <GPUComponent
