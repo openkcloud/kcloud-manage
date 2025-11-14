@@ -1,101 +1,106 @@
 # kcloud-manage
 # AI_SW_IDE
 
-GPU 리소스 모니터링 및 관리를 위한 대시보드 애플리케이션입니다.
+Dashboard application for GPU resource monitoring and management.
+
 
 ## 프로젝트 구조
 
 ```
 AI_SW_IDE/
-├── backend/           # FastAPI 백엔드 서버
-├── frontend/          # React 프론트엔드 애플리케이션
-├── data_observer/     # NFS 데이터 모니터링 서비스
-├── helm-chart/        # Kubernetes 배포용 Helm 차트
-└── deploy.sh          # 기존 배포 스크립트
+├── backend/           # FastAPI backend server
+├── frontend/          # React frontend application
+├── data_observer/     # NFS data monitoring servic
+├── helm-chart/        # Helm chart for Kubernetes deployment
+└── deploy.sh          # Legacy deployment script
 ```
 
-## 구성 요소
+## Components
 
 ### Backend (`backend/`)
-- **기술 스택**: FastAPI, Python
-- **기능**: GPU 리소스 모니터링 API, 데이터베이스 연동
-- **포트**: 8000
+- **Tech Stack**: FastAPI, Python
+- **Features**: GPU resource monitoring API, database integration
+- **Port**: 8000
 
 ### Frontend (`frontend/`)
-- **기술 스택**: React, Vite, TailwindCSS
-- **기능**: 웹 기반 대시보드 UI
-- **포트**: 80 (Nginx)
+- **Tech Stack**: React, Vite, TailwindCSS
+- **Features**: Web-based dashboard UI
+- **Port**: 80 (Nginx)
 
 ### Data Observer (`data_observer/`)
-- **기술 스택**: FastAPI, Python
-- **기능**: NFS 볼륨 데이터 모니터링 및 파일 시스템 분석
-- **포트**: 8000
+- **Tech Stack**: FastAPI, Python
+- **Features**: NFS volume data monitoring and filesystem analysis
+- **Port**: 8000
+
+## Prerequisites
+- DCGM Exporter
+- Prometheus
 
 ## Kubernetes 배포
 
-### Helm Chart 사용 (권장)
+### Helm Chart 사용 (Recommended)
 
-Kubernetes 클러스터에 배포하려면 `helm-chart/` 폴더를 사용하세요:
+To deploy to a Kubernetes cluster, use the `helm-chart/` folder:
 
 ```bash
 cd helm-chart
 ./quick-start.sh
 ```
 
-자세한 내용은 [helm-chart/README.md](helm-chart/README.md)를 참조하세요.
+For more details, refer to [helm-chart/README.md](helm-chart/README.md).
 
-### 주요 특징
-- **Subchart 구조**: Backend, Frontend, Data Observer가 각각 독립적인 subchart
-- **PostgreSQL 통합**: Bitnami PostgreSQL 차트 자동 설치
-- **NFS 볼륨 지원**: Data Observer용 NFS 자동 마운트
-- **Ingress 지원**: 외부 접근을 위한 Ingress 설정
-- **중앙 집중식 설정**: 최상단 values.yaml에서 모든 설정 관리
+### Key Features
+- **Subchart Structure**: Backend, Frontend, and Data Observer are independent subcharts
+- **PostgreSQL Integration**: Automatic installation of Bitnami PostgreSQL chart
+- **NFS Volume Support**: Automatic NFS mounting for Data Observer
+- **Ingress Support**: Ingress configuration for external access
+- **Centralized Configuration**: All settings managed from the top-level values.yaml
 
-## 로컬 개발
+## Local Development
 
-### Backend 개발
+### Backend Development
 ```bash
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Frontend 개발
+### Frontend Development
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### Data Observer 개발
+### Data Observer Development
 ```bash
 cd data_observer
 pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### API 문서
+### API Documentation
 
-각 서비스는 FastAPI의 자동 생성 문서를 제공합니다:
+Each service provides auto-generated FastAPI documentation:
 
 - Backend API: `http://localhost:8000/docs`
 - Data Observer API: `http://localhost:8001/docs`
 
-## 환경 설정
+# Environment Configuration
 
-각 컴포넌트는 환경 변수를 통해 설정됩니다:
+Each component is configured via environment variables:
 
 ### Backend
-- `DATABASE_URL`: PostgreSQL 연결 URL
-- `REDIS_URL`: Redis 연결 URL (선택사항)
+- `DATABASE_URL`: PostgreSQL connection URL
+- `REDIS_URL`: Redis connection URL (optional)
 
 ### Frontend
 - `REACT_APP_API_URL`: Backend API URL
 - `REACT_APP_DATA_OBSERVER_URL`: Data Observer URL
 
 ### Data Observer
-- `NFS_ROOT`: NFS 마운트 경로 (기본: `/home/jovyan`)
+- `NFS_ROOT`: NFS mount path (default: `/home/jovyan`)
 
-## 라이선스
+## License
 
 Apache 2.0
