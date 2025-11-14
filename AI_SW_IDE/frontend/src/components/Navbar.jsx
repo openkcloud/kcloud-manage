@@ -24,7 +24,7 @@ export function StickyNavbar() {
   }, []);
 
   const handleLogout = () => {
-    if (confirm("로그아웃 하시겠습니까?")) {
+    if (confirm("Are you sure you want to logout?")) {
       logout();
     }
   };
@@ -38,14 +38,14 @@ export function StickyNavbar() {
             href="#"
             className="mr-4 cursor-pointer py-1.5 font-medium"
           >
-            AI Software IDE
+            AI SOFTWARE IDE
           </Typography>
           
-          {/* 우상단 사용자 정보 및 로그아웃 버튼 */}
+          {/* Top right user information and logout button */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-blue-gray-600">
               <UserCircleIcon className="h-5 w-5" />
-              <span>{currentUser?.username || "사용자"}</span>
+              <span>{currentUser?.username || "User"}</span>
             </div>
             
             <Button
@@ -55,7 +55,7 @@ export function StickyNavbar() {
               onClick={handleLogout}
             >
               <ArrowRightOnRectangleIcon className="h-4 w-4" />
-              로그아웃
+              Logout
             </Button>
           </div>
         </div>
