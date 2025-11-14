@@ -7,9 +7,9 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path='./prod.env')
 try:
     config.load_incluster_config()
-    pass  # 클러스터 내 설정 로드 성공
+    pass  # Successfully loaded in-cluster configuration
 except Exception as e:
-    pass  # 로컬 설정으로 fallback
+    pass  # Fallback to local configuration
     import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     
