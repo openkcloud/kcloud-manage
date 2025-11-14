@@ -34,7 +34,7 @@ class ServerGpuMapping(Base):
     server_id = Column(Integer, ForeignKey("servers.id"), nullable=False)
     gpu_id = Column(Integer, ForeignKey("gpu_flavor.id"), nullable=False)
     
-    # 관계 설정
+    # set relationship
     server = relationship("PodCreation", foreign_keys=[server_id])
     gpu_flavor = relationship("Flavor", foreign_keys=[gpu_id])
     
