@@ -54,8 +54,8 @@ def login(
 @router.post("/refresh", response_model=LoginResponse)
 def refresh_token(request: RefreshTokenRequest):
     """
-    클라이언트가 보낸 refresh token을 검증하고,
-    새로운 access token을 발급합니다.
+    Validates the refresh token sent by the client
+    and issues a new access token.
     """
     try:
         payload = decode_refresh_token(request.refresh_token)
@@ -77,18 +77,18 @@ def refresh_token(request: RefreshTokenRequest):
             detail="Invalid refresh token"
         )
     
-    # 새로운 access token 발급 (60분 만료)
+    # Issue new access token (expires in 60 minutes)
     new_access_token = create_access_token(
         data={"sub": email, "role": role},
         expires_delta=datetime.timedelta(minutes=60)
     )
     
-    # 여기서는 동일하게 user 정보는 재사용한다고 가정 (실제 DB 조회 필요할 수도 있음)
+    # Reuse user information here (may need to query DB)
     user_info = {
         "email": email,
-        "name": "User Name",       # 실제 사용자 정보로 대체
+        "name": "User Name",       # Replace with actual user information
         "role": role,
-        "department": "Department" # 실제 사용자 정보로 대체
+        "department": "Department" # Replace with actual user information
     }
     
     return LoginResponse(**user_info, success=True, token=new_access_token)
@@ -96,7 +96,7 @@ def refresh_token(request: RefreshTokenRequest):
     
 @router.post("/create_user")
 def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
-    # 이미 같은 이메일의 사용자가 있는지 확인
+    # Check if a user with the same email already exists
     existing_user = db.query(User).filter(User.email == user_data.email).first()
     if existing_user:
         raise HTTPException(
@@ -104,13 +104,13 @@ def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
             detail="User already exists"
         )
     
-    # 비밀번호 해싱
+    # Hash password
     hashed_pw = hash_password(user_data.password)
     
     user = User(
         email=user_data.email,
-        hashed_password=hashed_pw,  # 해싱된 비밀번호 저장
-        role=user_data.role,          # 필요에 따라 기본값 설정 가능
+        hashed_password=hashed_pw,  # Store hashed password
+        role=user_data.role,          # Can set default value if needed
         name=user_data.name,
         department=user_data.department,
     )
