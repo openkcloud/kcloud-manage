@@ -1,0 +1,48 @@
+1. AI Software IDE가 성공적으로 배포되었습니다!
+
+2. 다음 명령어로 애플리케이션 상태를 확인하세요:
+   kubectl get pods -l "app.kubernetes.io/instance={{ .Release.Name }}" -n {{ .Release.Namespace }}
+
+3. Frontend 서비스에 접근하려면:
+{{- if contains "NodePort" .Values.frontend.service.type }}
+   export NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+   echo "Frontend URL: http://$NODE_IP:{{ .Values.frontend.service.nodePort }}"
+{{- else if contains "LoadBalancer" .Values.frontend.service.type }}
+     NOTE: LoadBalancer 타입의 External IP를 가져오는데 시간이 걸릴 수 있습니다.
+   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ .Release.Name }}-frontend --template "{{ "{{" }} range (index .status.loadBalancer.ingress 0) {{ "}}" }}{{ "{{" }}.{{ "}}" }}{{ "{{" }} end {{ "}}" }}")
+   echo "Frontend URL: http://$SERVICE_IP:{{ .Values.frontend.service.port }}"
+{{- else }}
+   kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-frontend 8080:80
+   echo "Frontend URL: http://127.0.0.1:8080"
+{{- end }}
+
+4. Backend API에 접근하려면:
+{{- if contains "NodePort" .Values.backend.service.type }}
+   export NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+   echo "Backend API URL: http://$NODE_IP:{{ .Values.backend.service.nodePort }}/docs"
+{{- else if contains "LoadBalancer" .Values.backend.service.type }}
+   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ .Release.Name }}-backend --template "{{ "{{" }} range (index .status.loadBalancer.ingress 0) {{ "}}" }}{{ "{{" }}.{{ "}}" }}{{ "{{" }} end {{ "}}" }}")
+   echo "Backend API URL: http://$SERVICE_IP:{{ .Values.backend.service.port }}/docs"
+{{- else }}
+   kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-backend 8000:8000
+   echo "Backend API URL: http://127.0.0.1:8000/docs"
+{{- end }}
+
+5. Data Observer에 접근하려면:
+   kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-data-observer 8001:8000
+   echo "Data Observer API URL: http://127.0.0.1:8001/docs"
+
+{{- if .Values.postgresql.enabled }}
+6. PostgreSQL 데이터베이스에 접근하려면:
+   export POSTGRES_PASSWORD=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ .Release.Name }}-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)
+   kubectl run {{ .Release.Name }}-postgresql-client --rm --tty -i --restart='Never' --namespace {{ .Release.Namespace }} --image docker.io/bitnami/postgresql:15 --env="PGPASSWORD=$POSTGRES_PASSWORD" \
+      --command -- psql --host {{ .Release.Name }}-postgresql --username postgres --dbname {{ .Values.postgresql.auth.database }} --port 5432
+{{- end }}
+
+=== 서비스 포트 정보 ===
+- Frontend: NodePort {{ .Values.frontend.service.nodePort }}
+- Backend: NodePort {{ .Values.backend.service.nodePort }}
+- Data Observer: ClusterIP (포트 포워딩 필요)
+
+클러스터의 노드 IP를 확인하려면:
+kubectl get nodes -o wide
