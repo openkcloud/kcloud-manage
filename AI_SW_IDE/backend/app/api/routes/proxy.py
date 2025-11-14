@@ -13,9 +13,9 @@ from app.core.logger import app_logger
 
 router = APIRouter()
 
-# 데이터베이스에서 서버 정보 조회
+# Query server information from database
 def get_server_address(db: Session, instance_id: str) -> str:
-    """instance_id(서버 ID)로 내부 IP 조회"""
+    """Get internal IP by instance_id (server ID)"""
     try:
         server = db.query(PodCreation).filter(PodCreation.id == int(instance_id)).first()
         if not server:
@@ -93,7 +93,7 @@ async def proxy_http_request(
                     rf'\g<pre>/proxy/{user_name}/{instance_id}/\g<path>',
                     modified_content
                 )
-                # image 태그 내 src 속성도 커버
+                # Also cover src attribute in img tags
                 modified_content = re.sub(
                     r'(<img[^>]+src=["\'])/([^"\']+)',
                     rf'\1/proxy/{user_name}/{instance_id}/\2',
@@ -116,14 +116,14 @@ async def proxy_http_request(
         app_logger.error(f"HTTP proxy error: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-# kernelspecs 등의 specific 경로들을 위한 라우터
+# Router for specific paths like kernelspecs
 @router.api_route("/kernelspecs/{path:path}", methods=["GET"])
 async def proxy_kernelspecs(
     request: Request,
     path: str,
     db: Session = Depends(get_db)
 ):
-    """kernelspecs 요청을 처리"""
+    """Handle kernelspecs requests"""
     return await handle_static_proxy(request, f"kernelspecs/{path}", db)
 
 @router.api_route("/static/{path:path}", methods=["GET"]) 
@@ -132,7 +132,7 @@ async def proxy_static_files(
     path: str,
     db: Session = Depends(get_db)
 ):
-    """static 파일 요청을 처리"""
+    """Handle static file requests"""
     return await handle_static_proxy(request, f"static/{path}", db)
 
 @router.api_route("/nbextensions/{path:path}", methods=["GET"])
@@ -141,15 +141,15 @@ async def proxy_nbextensions(
     path: str,
     db: Session = Depends(get_db)
 ):
-    """nbextensions 요청을 처리"""
+    """Handle nbextensions requests"""
     return await handle_static_proxy(request, f"nbextensions/{path}", db)
 
 async def handle_static_proxy(request: Request, static_path: str, db: Session):
-    """공통 static 파일 프록시 처리 함수"""
-    # Referer 헤더에서 사용자와 인스턴스 정보 추출
+    """Common static file proxy handler function"""
+    # Extract user and instance information from Referer header
     referer = request.headers.get("referer", "")
     
-    # Referer에서 /proxy/{user_name}/{instance_id} 패턴 찾기
+    # Find /proxy/{user_name}/{instance_id} pattern in Referer
     import re
     match = re.search(r'/proxy/([^/]+)/(\d+)', referer)
     if not match:
@@ -157,7 +157,7 @@ async def handle_static_proxy(request: Request, static_path: str, db: Session):
     
     user_name, instance_id = match.groups()
     
-    # 기존 프록시 로직 재사용
+    # Reuse existing proxy logic
     base_address = get_server_address(db, instance_id)
     if not base_address:
         raise HTTPException(status_code=404, detail=f"Server with instance_id {instance_id} not found or no internal IP")
@@ -186,7 +186,7 @@ async def handle_static_proxy(request: Request, static_path: str, db: Session):
 
 @router.websocket("/{user_name}/{instance_id}/{full_path:path}")
 async def proxy_websocket(websocket: WebSocket, user_name: str, instance_id: str, full_path: str):
-    # WebSocket에서는 Depends를 직접 사용할 수 없으므로 수동으로 DB 세션 생성
+    # Cannot use Depends directly in WebSocket, so create DB session manually
     from app.db.session import SessionLocal
     db = SessionLocal()
     jupyter_ws = None
@@ -208,7 +208,7 @@ async def proxy_websocket(websocket: WebSocket, user_name: str, instance_id: str
         try:
             jupyter_ws = await websockets.connect(jupyter_ws_url, close_timeout=1.0)
             
-            # 태스크 생성
+            # Create tasks
             client_to_jupyter = asyncio.create_task(
                 relay_client_to_jupyter(websocket, jupyter_ws)
             )
@@ -216,21 +216,21 @@ async def proxy_websocket(websocket: WebSocket, user_name: str, instance_id: str
                 relay_jupyter_to_client(websocket, jupyter_ws)
             )
             
-            # 태스크 대기 및 정리
+            # Wait for tasks and cleanup
             try:
                 done, pending = await asyncio.wait(
                     [client_to_jupyter, jupyter_to_client], 
                     return_when=asyncio.FIRST_COMPLETED
                 )
                 
-                # 완료된 태스크들의 예외 확인
+                # Check exceptions from completed tasks
                 for task in done:
                     try:
                         result = await task
                     except Exception as e:
                         app_logger.error(f"WebSocket task error: {e}")
                 
-                # 남은 태스크들 정리
+                # Clean up remaining tasks
                 for task in pending:
                     task.cancel()
                     try:
@@ -242,24 +242,24 @@ async def proxy_websocket(websocket: WebSocket, user_name: str, instance_id: str
                 app_logger.error(f"WebSocket relay error: {e}")
                 
         except websockets.exceptions.ConnectionClosed:
-            pass  # 정상적인 연결 종료
+            pass  # Normal connection close
         except websockets.exceptions.InvalidHandshake as e:
             app_logger.error(f"WebSocket handshake failed: {e}")
         except Exception as e:
             app_logger.error(f"WebSocket connection error: {e}")
             
     except WebSocketDisconnect:
-        pass  # 클라이언트 연결 해제는 정상적인 상황
+        pass  # Client disconnection is a normal situation
     except Exception as e:
         app_logger.error(f"WebSocket proxy error: {e}")
     finally:
-        # 태스크 강제 정리
+        # Force cleanup of tasks
         await cleanup_tasks(client_to_jupyter, jupyter_to_client)
-        # 리소스 정리
+        # Clean up resources
         await cleanup_websocket_resources(websocket, jupyter_ws, db)
 
 async def cleanup_tasks(*tasks):
-    """asyncio 태스크들을 안전하게 정리"""
+    """Safely cleanup asyncio tasks"""
     for task in tasks:
         if task and not task.done():
             task.cancel()
@@ -271,40 +271,40 @@ async def cleanup_tasks(*tasks):
                 app_logger.error(f"Error cleaning up task: {e}")
 
 async def cleanup_websocket_resources(websocket: WebSocket, jupyter_ws, db):
-    """WebSocket 리소스를 안전하게 정리"""
-    # Jupyter WebSocket 정리
+    """Safely cleanup WebSocket resources"""
+    # Cleanup Jupyter WebSocket
     if jupyter_ws:
         try:
             await asyncio.wait_for(jupyter_ws.close(), timeout=2.0)
         except (asyncio.TimeoutError, Exception):
-            pass  # 정리 과정에서 발생하는 오류는 무시
+            pass  # Ignore errors during cleanup
     
-    # 클라이언트 WebSocket 정리
+    # Cleanup client WebSocket
     try:
         if (hasattr(websocket, 'client_state') and 
             websocket.client_state not in [WebSocketState.DISCONNECTED]):
             await asyncio.wait_for(websocket.close(code=1000), timeout=2.0)
     except (asyncio.TimeoutError, Exception):
-        pass  # 정리 과정에서 발생하는 오류는 무시
+        pass  # Ignore errors during cleanup
     
-    # DB 세션 정리
+    # Cleanup DB session
     try:
         if db:
             db.close()
     except Exception:
-        pass  # DB 정리 오류는 무시
+        pass  # Ignore DB cleanup errors
     
-    # 메모리 정리 (로깅 시스템은 건드리지 않음)
+    # Memory cleanup (don't touch logging system)
     import gc
     gc.collect()
 
 async def relay_client_to_jupyter(websocket: WebSocket, jupyter_ws):
-    """클라이언트에서 Jupyter로 메시지 릴레이"""
+    """Relay messages from client to Jupyter"""
     try:
         while True:
             try:
                 msg = await websocket.receive_text()
-                # websockets 라이브러리의 연결 상태 확인 방법 개선
+                # Improved connection state checking for websockets library
                 try:
                     await jupyter_ws.send(msg)
                 except websockets.exceptions.ConnectionClosed:
@@ -322,12 +322,12 @@ async def relay_client_to_jupyter(websocket: WebSocket, jupyter_ws):
         app_logger.error(f"Client to Jupyter relay error: {e}")
 
 async def relay_jupyter_to_client(websocket: WebSocket, jupyter_ws):
-    """Jupyter에서 클라이언트로 메시지 릴레이"""
+    """Relay messages from Jupyter to client"""
     try:
         while True:
             try:
                 msg = await jupyter_ws.recv()
-                # 클라이언트 연결 상태 확인을 더 안전하게
+                # Safer client connection state checking
                 if (hasattr(websocket, 'client_state') and 
                     websocket.client_state == WebSocketState.DISCONNECTED):
                     break
