@@ -67,19 +67,19 @@ export default function HardwareSelection() {
     setServerName("");
     setDescription("");
 
-    fetchNodeResources(); // ✅ 초기화 시 노드 리소스 재조회
-    fetchPVCList(); // ✅ 초기화 시 PVC 목록 재조회
+    fetchNodeResources(); // ✅ Re-fetch node resources on reset
+    fetchPVCList(); // ✅ Re-fetch PVC list on reset
 
     setTimeout(() => setIsRotating(false), 500);
   };
 
   useEffect(() => {
-    fetchNodeResources(); // ✅ 처음 렌더링 시 1번 호출
-    fetchPVCList(); // ✅ 처음 렌더링 시 PVC 목록 호출
+    fetchNodeResources(); // ✅ Call once on initial render
+    fetchPVCList(); // ✅ Fetch PVC list on initial render
   }, []);
 
   const handleCreateServer = async () => {
-    // 선택된 PVC 정보 찾기
+    //Find selected PVC information
     const selectedPvcInfo = pvcList.find(pvc => pvc.pvc_name === existingPVC);
     
     const payload = {
@@ -94,7 +94,7 @@ export default function HardwareSelection() {
       pvc_name: useNewPVC ? null : existingPVC,
     };
   
-    setIsLoading(true); // ✅ 시작 시 로딩 true
+    setIsLoading(true); // ✅ Set loading to true at start
   
     try {
       const response = await fetchWithAuth("/server/create-pod", {
@@ -104,20 +104,20 @@ export default function HardwareSelection() {
   
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.detail || "서버 생성 실패");
+        throw new Error(err.detail || "Server creation failed");
       }
   
       const result = await response.json();
-      alert("✅ GPU 서버 생성 완료!");
+      alert("✅ GPU server created successfully!");
       console.log(result);
       
       // My Server 탭으로 이동
       navigate("/admin/server");
     } catch (error) {
       console.error("Error creating server:", error);
-      alert("❌ 서버 생성 중 오류가 발생했습니다.");
+      alert("❌ An error occurred while creating the server.");
     } finally {
-      setIsLoading(false); // ✅ 완료 후 로딩 false
+      setIsLoading(false); // ✅ Set loading to false after completion
     }
   };
 
@@ -151,7 +151,7 @@ export default function HardwareSelection() {
         />
       </button>
 
-      {/* Node 리소스 카드 */}
+      {/* Node resource cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-6">
         {nodeResources.map((node) => (
           <div key={node.node} className="bg-white border rounded-xl shadow p-4">
@@ -179,7 +179,7 @@ export default function HardwareSelection() {
         ))}
       </div>
 
-      {/* 카테고리별 옵션 */}
+      {/* Options by category */}
       {Object.keys(options).map((category, index) => {
         const isVisible =
           index === 0 || selectedValues[Object.keys(options)[index - 1]] !== null;
@@ -223,7 +223,7 @@ export default function HardwareSelection() {
               </div>
             </div>
 
-            {/* 구분선 */}
+            {/* Divider */}
             {selectedValues[category] && index < Object.keys(options).length && (
               <motion.div
                 initial={{ opacity: 0, width: "0%" }}
@@ -236,7 +236,7 @@ export default function HardwareSelection() {
         );
       })}
       <div className="w-full flex flex-col items-start space-y-6">
-        {/* Server Name + Description 같이 보여주기 */}
+        {/* Show Server Name + Description together */}
         {allSelected && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -244,7 +244,7 @@ export default function HardwareSelection() {
             transition={{ duration: 0.3 }}
             className="w-full space-y-6 mb-10"
           >
-            {/* PVC 선택 영역 */}
+            {/* PVC selection area */}
             <div className="flex items-center space-x-4 mt-2">
               <input
                 type="checkbox"
@@ -257,7 +257,7 @@ export default function HardwareSelection() {
               Create new PVC
               </label>
             </div>
-            {/* 기존 PVC 선택 드롭다운 */}
+            {/* Existing PVC selection dropdown */}
             <AnimatePresence>
               {!useNewPVC && (
                 <motion.div
@@ -285,7 +285,7 @@ export default function HardwareSelection() {
                     </select>
                   </div>
 
-                  {/* ✅ 구분선 */}
+                  {/* ✅ Divider */}
                   <motion.div
                     initial={{ opacity: 0, width: "0%" }}
                     animate={{ opacity: 1, width: "100%" }}
@@ -337,7 +337,7 @@ export default function HardwareSelection() {
       </div>
       
 
-      {/* 서버 생성 버튼 */}
+      {/* Server creation button */}
       {allSelected && serverName && (
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
@@ -367,7 +367,7 @@ export default function HardwareSelection() {
               />
             </svg>
           ) : (
-            "GPU 서버 생성"
+            "Create GPU server"
           )}
         </motion.button>
       )}
