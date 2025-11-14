@@ -1,48 +1,48 @@
 # AI Software IDE Helm Chart
 
-이 Helm 차트는 GPU 대시보드 애플리케이션을 Kubernetes 클러스터에 배포합니다.
+This Helm chart deploys the AI SOFTWARE IDE application to a Kubernetes cluster.
 
-## 구성 요소
+## Components 
 
-- **Backend**: FastAPI 기반 백엔드 API 서버
-- **Frontend**: React 기반 프론트엔드 웹 애플리케이션  
-- **Data Observer**: NFS 볼륨 데이터 모니터링 서비스
-- **PostgreSQL**: 데이터베이스 (Bitnami 차트 사용)
+- **Backend**: FastAPI-based backend API server
+- **Frontend**: React-based frontend web application  
+- **Data Observer**: NFS volume data monitoring service
+- **PostgreSQL**: Database (using Bitnami chart)
 
-## 설치 전 요구사항
+## Prerequisites
 
 - Kubernetes 1.19+
 - Helm 3.2.0+
-- PV 프로비저너 (영구 볼륨용)
-- NFS 서버 (Data Observer용)
+- PV Provisioner (for persistent volumes)
+- NFS Server (for Data Observer)
 
-## 환경별 설정
+## Environment-specific Configuration
 
-AI Software IDE는 환경별로 달라질 수 있는 설정들을 `global.environment` 섹션에서 중앙 관리합니다.
+AI SOFTWARE IDE centrally manages environment-specific settings in the `global.environment` section.
 
-### 주요 환경 설정
+### Key Environment Settings
 
 ```yaml
 global:
   environment:
-    # NFS 서버 설정
+    # NFS server configuration
     nfs:
       address: "<YOUR_NFS_SERVER_IP>"
     
-    # Kubernetes 워커 노드명
+    # Kubernetes worker node names
     nodes:
       workers: "<YOUR_WORKER_NODE_NAMES>(comma-separated: e.g. k8s-worker-1,k8s-worker-2)"
     
-    # 외부 서비스 URL
+    # Exterenal service URLs
     services:
       prometheus: "<YOUR_PROMETHEUS_ADDRESS>"
       redis: "redis://<YOUR_REDIS_HOST>:6379/0"
     
-    # CORS 설정
+    # CORS configuration
     cors:
       origins: "http://gpu-dashboard-frontend.gpu-dashboard.svc.cluster.local:4000,http://localhost:4000,http://127.0.0.1:4000"
     
-    # 애플리케이션 설정
+    # Application settings
     app:
       logLevel: "INFO"
       gpuFetchInterval: "30"
@@ -50,24 +50,24 @@ global:
       secretKey: "<YOUR_SECRET_KEY>"
 ```
 
-### 환경별 설정 변경 방법
+### How to Change Environment-specific Settings
 
-1. **values.yaml 직접 수정**
+1. **Edit values.yaml directly**
    ```bash
    vi values.yaml
-   # global.environment 섹션 수정
+   # Edit global.environment section
    ```
 
-2. **Helm install 시 오버라이드**
+2. **Override during Helm install**
    ```bash
    helm install gpu-dashboard . \
      --set global.environment.nfs.address="<YOUR_NFS_SERVER_IP> \
      --set global.environment.nodes.workers="<YOUR_WORKER_NODE_NAMES>"
    ```
 
-3. **별도 values 파일 사용**
+3. **Use separate values file**
    ```bash
-   # production-values.yaml 생성
+   # Create production-values.yaml 
    echo "
    global:
      environment:
@@ -80,60 +80,60 @@ global:
    helm install gpu-dashboard . -f production-values.yaml
    ```
 
-## 빠른 시작
+## Quick Start
 
-### 1. 이 폴더로 이동
+### 1. Navigate to this folder
 ```bash
 cd helm-chart
 ```
 
-### 2. 원클릭 배포
+### 2. One-click deployment
 ```bash
 ./quick-start.sh
 ```
 
-**AI Software IDE Deployment Tool**은 다음 기능을 제공합니다:
-- 🔍 **환경 검증**: kubectl, helm 설치 및 클러스터 접근 확인
-- 🏷️  **네임스페이스 관리**: 자동 감지 및 생성
-- 📦 **의존성 해결**: Helm 리포지토리 및 차트 의존성 자동 처리
-- 🚀 **원클릭 배포**: 진행 상황 표시와 함께 완전 자동화된 배포
-- 📊 **상태 검증**: 배포 후 모든 Pod 상태 실시간 확인
-- 📋 **접근 정보**: 서비스 접근 URL 및 관리 명령어 자동 생성
+**AI SOFTWARE IDE Deployment Tool** provides the following features:
+- 🔍 **Environment Validation**: Check kubectl, helm installation and cluster access
+- 🏷️  **Namespace Management**: Automatic detection and creation
+- 📦 **Dependency Resolution**: Automatic handling of Helm repositories and chart dependencies
+- 🚀 **One-click Deployment**: Fully automated deployment with progress display
+- 📊 **Status Verification**: Real-time checking of all Pod statuses after deployment
+- 📋 **Access Information**: Automatic generation of service access URLs and management commands
 
-## 수동 설치
+## Manual Installation
 
-### 1. Helm 리포지토리 추가
+### 1. Add Helm repository
 ```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 ```
 
-### 2. 의존성 업데이트
+### 2. Update dependencies
 ```bash
 helm dependency update
 ```
 
-### 3. 설치
+### 3. Install
 ```bash
 helm install gpu-dashboard . -n gpu-dashboard --create-namespace
 ```
 
-### 4. 커스텀 값으로 설치
+### 4. Install with custom values
 ```bash
 helm install gpu-dashboard . -n gpu-dashboard --create-namespace -f custom-values.yaml
 ```
 
-## 설정
+## Configuration
 
-### 주요 설정 값
+### Key Configuration Values
 
 ```yaml
-# 글로벌 설정
+# Global settings
 global:
   imageRegistry: ""
   namespace: gpu-dashboard
 
-# 백엔드 설정
+# Backend settings
 backend:
   enabled: true
   image:
@@ -147,7 +147,7 @@ backend:
     - name: DATABASE_URL
       value: "postgresql://<DB_USER>:<DB_PASSWORD>@gpu-dashboard-postgresql:5432/gpu_dashboard"
 
-# 프론트엔드 설정  
+# Frontend settings
 frontend:
   enabled: true
   image:
@@ -160,7 +160,7 @@ frontend:
   ingress:
     enabled: false
 
-# 데이터 옵저버 설정
+# Data Observer settings
 data-observer:
   enabled: true
   image:
@@ -171,7 +171,7 @@ data-observer:
     server: "your-nfs-server.example.com"
     path: "/path/to/nfs/share"
 
-# PostgreSQL 설정
+# PostgreSQL settings
 postgresql:
   enabled: true
   auth:
@@ -180,25 +180,26 @@ postgresql:
     password: "<DB_PASSWORD>"
 ```
 
-### NFS 설정
+### NFS Configuration
 
-Data Observer에서 NFS 볼륨을 사용하려면:
+To use NFS volumes with Data Observer::
 
 ```yaml
 data-observer:
   nfs:
     enabled: true
-    server: "<YOUR_NFS_SERVER_IP>"  # NFS 서버 IP
-    path: "/mnt/nfs/data"    # NFS 공유 경로
-    mountPath: "/nfsvolume"  # 컨테이너 내 마운트 경로
+    server: "<YOUR_NFS_SERVER_IP>"  # NFS server IP
+    path: "/mnt/nfs/data"    # NFS share path
+    mountPath: "/nfsvolume"  # Mount path inside container
 ```
 
-### NodePort 접근
+### NodePort Access
 
-Frontend와 Backend는 NodePort 서비스로 구성되어 있어 클러스터 외부에서 직접 접근 가능합니다:
+
+Frontend and Backend are configured as NodePort services, allowing direct access from outside the cluster:
 
 ```bash
-# 노드 IP 확인
+# Check node IP 
 export NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
 
 # 서비스 접근
@@ -206,9 +207,9 @@ echo "Frontend: http://$NODE_IP:30080"
 echo "Backend API: http://$NODE_IP:30800/docs"
 ```
 
-### Ingress 설정 (선택사항)
+### Ingress Configuration (Optional)
 
-필요시 Ingress를 활성화할 수 있습니다:
+You can enable Ingress if needed:
 
 ```yaml
 frontend:
@@ -224,57 +225,57 @@ frontend:
             pathType: Prefix
 ```
 
-## 업그레이드
+## Upgrade
 
 ```bash
 helm upgrade gpu-dashboard . -n gpu-dashboard
 ```
 
-## 제거
+## Removal
 
 ```bash
 helm uninstall gpu-dashboard -n gpu-dashboard
 ```
 
-## 문제 해결
+## Troubleshooting
 
-### 1. Pod 상태 확인
+### 1. Check Pod Status
 ```bash
 kubectl get pods -n gpu-dashboard
 ```
 
-### 2. 로그 확인
+### 2. Check Logs
 ```bash
 kubectl logs -n gpu-dashboard deployment/gpu-dashboard-backend
 kubectl logs -n gpu-dashboard deployment/gpu-dashboard-frontend  
 kubectl logs -n gpu-dashboard deployment/gpu-dashboard-data-observer
 ```
 
-### 3. 서비스 확인
+### 3. Check Services
 ```bash
 kubectl get svc -n gpu-dashboard
 ```
 
-### 4. Ingress 확인
+### 4. Check Ingress
 ```bash
 kubectl get ingress -n gpu-dashboard
 ```
 
-## 개발
+## Development
 
-### 서비스 접근 방법
+### Service Accecss Methods
 
-#### NodePort로 직접 접근 (권장)
+#### Direct Access via NodePort (Recommended)
 ```bash
-# 노드 IP 확인
+# Check node IP 
 export NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
 
-# 서비스 접근
+# Access services
 echo "Frontend: http://$NODE_IP:30080"
 echo "Backend API: http://$NODE_IP:30800/docs"
 ```
 
-#### 포트 포워딩으로 접근
+#### Access via Port Forwarding
 ```bash
 # Backend API
 kubectl port-forward -n gpu-dashboard svc/gpu-dashboard-backend 8000:8000
@@ -289,24 +290,26 @@ kubectl port-forward -n gpu-dashboard svc/gpu-dashboard-data-observer 8001:8000
 kubectl port-forward -n gpu-dashboard svc/gpu-dashboard-postgresql 5432:5432
 ```
 
-## 폴더 구조
+## Folder Structure
 
 ```
 helm-chart/
-├── Chart.yaml              # 차트 메타데이터
-├── values.yaml             # 기본 설정값
-├── templates/              # 메인 템플릿
-│   ├── _helpers.tpl        # 헬퍼 함수
-│   └── NOTES.txt          # 설치 후 안내사항
-├── charts/                 # Subchart들
+├── Chart.yaml              # Chart metadata
+├── values.yaml             # Default configuration values
+├── templates/              # Main templates
+│   ├── _helpers.tpl        # Helper functions
+│   └── NOTES.txt          # Post-installation notes
+├── charts/                 # Subcharts
 │   ├── backend/           # Backend subchart
 │   ├── frontend/          # Frontend subchart
 │   └── data-observer/     # Data Observer subchart
-├── README.md              # 이 파일
-├── install-guide.md       # 상세 설치 가이드
-└── quick-start.sh         # 빠른 설치 스크립트
+├── README.md              # This file
+├── install-guide.md       # Detailed installation guide
+└── quick-start.sh         # Quick installation script
 ```
 
-## 라이선스
+## License
 
-이 프로젝트는 Apache 2.0 라이선스를 따릅니다.
+This project follows the Apache2.0 license.
+
+
