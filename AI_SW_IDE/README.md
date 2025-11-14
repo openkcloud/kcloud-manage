@@ -74,7 +74,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## API 문서
+### API 문서
 
 각 서비스는 FastAPI의 자동 생성 문서를 제공합니다:
 

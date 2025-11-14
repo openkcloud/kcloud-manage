@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpu-dashboard-frontend-nodeport
+  namespace: gpu-dashboard
+  labels:
+    app: gpu-dashboard-frontend
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+    nodePort: 30080  # 외부에서 접근할 포트
+  selector:
+    app: gpu-dashboard-frontend 
