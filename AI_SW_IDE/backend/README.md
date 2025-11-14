@@ -1,4 +1,4 @@
-# GPU Dashboard Backend
+# AI Software IDE Backend
 
 GPU 클러스터 관리를 위한 FastAPI 기반 백엔드 서비스입니다. Kubernetes 환경에서 GPU 리소스를 할당하고 관리하며, Jupyter Lab 서버를 동적으로 생성/삭제할 수 있는 기능을 제공합니다.
 

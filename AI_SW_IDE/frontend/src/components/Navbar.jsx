@@ -38,7 +38,7 @@ export function StickyNavbar() {
             href="#"
             className="mr-4 cursor-pointer py-1.5 font-medium"
           >
-            GPU Dashboard
+            AI Software IDE
           </Typography>
           
           {/* 우상단 사용자 정보 및 로그아웃 버튼 */}
