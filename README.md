@@ -18,30 +18,31 @@ kcloud-manage/
 ## Components
 
 ### Backend (`AI_SW_IDE/backend/`)
-- **Tech Stack**: FastAPI, Python
-- **Features**: GPU monitoring API, Kubernetes pod management, authentication, PostgreSQL integration, Prometheus metrics
+- **Tech Stack**: FastAPI, Python, PostgreSQL, SQLAlchemy
+- **Features**: Server Management, GPU Resource Management, Storage Management, etc
+- **Documentation**: [Backend README](AI_SW_IDE/backend/README.md)
 
 ### Frontend (`AI_SW_IDE/frontend/`)
 - **Tech Stack**: React, Vite, TailwindCSS
-- **Features**: Web dashboard UI, GPU node monitoring, pod management, storage management
+- **Features**: Web dashboard UI, GPU Server Creation, Real-time Monitoring, Storage Management, etc
+- **Documentation**: [Frontend README](AI_SW_IDE/frontend/README.md)
 
 ### Data Observer (`AI_SW_IDE/data_observer/`)
 - **Tech Stack**: FastAPI, Python
-- **Features**: NFS volume monitoring, filesystem analysis
+- **Features**: NFS Volume Directory Browsing 
 
 ### Helm Chart (`AI_SW_IDE/helm-chart/`)
 - Subchart-based architecture (Backend, Frontend, Data Observer)
 - Automatic Bitnami PostgreSQL installation
-- Centralized configuration via top-level values.yaml
 
   
 ## Prerequisites
 
-- Kubernetes cluster (1.20+)
-- Helm 3.x
+- Kubernetes cluster (1.19+)
+- Helm 3.2.0+
 - DCGM Exporter
 - Prometheus
-- NFS server (optional)
+- NFS server 
 
 ## Quick Start
 
