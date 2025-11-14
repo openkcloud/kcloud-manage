@@ -23,7 +23,7 @@ AI_SW_IDE is a Kubernetes-native platform that provides GPU resource monitoring,
    - Resource availability tracking
 
 2. **User-Initiated Development Environment Provisioning**
-   - Kubernetes Pod-based development environment server creation (supports various containerized IDEs: Jupyter Lab, VSCode, etc.)
+   - Kubernetes Pod-based development environment server creation (containerized IDEs: Jupyter Lab)
    - Resource selection from predefined options (CPU, Memory, GPU)
    - Custom container image and command configuration
    - Manual environment deletion with resource reclamation
