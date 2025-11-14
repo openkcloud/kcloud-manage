@@ -151,7 +151,7 @@ export default function PixelCard({
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
   ).current;
 
-  const [isHovered, setIsHovered] = useState(false); // 배경 상태 관리
+  const [isHovered, setIsHovered] = useState(false); // Manage background state
 
   const variantCfg = VARIANTS[variant] || VARIANTS.default;
   const finalGap = gap ?? variantCfg.gap;
@@ -235,13 +235,13 @@ export default function PixelCard({
   const onMouseEnter = () => handleAnimation("appear");
   const onMouseLeave = () => handleAnimation("disappear");
   const handleMouseEnter = (event) => {
-    setIsHovered(true); // 배경색 제거
-    if (onMouseEnter) onMouseEnter(event); // 기존 핸들러 실행
+    setIsHovered(true); // Remove background color
+    if (onMouseEnter) onMouseEnter(event); // Execute existing handler
   };
 
   const handleMouseLeave = (event) => {
-    setIsHovered(false); // 배경색 복구
-    if (onMouseLeave) onMouseLeave(event); // 기존 핸들러 실행
+    setIsHovered(false); // Restore background color
+    if (onMouseLeave) onMouseLeave(event); // Execute existing handler
   };
 
   const onFocus = (e) => {
