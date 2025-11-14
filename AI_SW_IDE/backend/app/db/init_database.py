@@ -37,7 +37,7 @@ def init_flavors_from_csv(csv_path):
                     flavor = Flavor(
                         gpu_name=row['gpu_name'],
                         available=int(row['available']),
-                        worker_node=(row.get('worker_node') or '').strip(),  # NOT NULL 대응
+                        worker_node=(row.get('worker_node') or '').strip(),  # Handle NOT NULL constraint
                         gpu_id=int((row.get('gpu_id') or 0)),
                         mig_id=int((row.get('mig_id') or 0)),
                     )
