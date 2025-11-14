@@ -1,38 +1,51 @@
 # kcloud-manage
 
-Kubernetes monitoring platform for GPU resources.
+## Modules
 
-## Project Structure
+### AI_SW_IDE
 
-```
-kcloud-manage/
-├── AI_SW_IDE/          # AI Software IDE - GPU resource monitoring dashboard
-│   ├── backend/        # FastAPI backend server
-│   ├── frontend/       # React frontend application
-│   ├── data_observer/  # NFS data monitoring service
-│   ├── helm-chart/     # Helm chart for Kubernetes deployment
-│   └── deploy.sh       # Legacy deployment script
-└── LICENSE             # Apache 2.0 License
-```
+**GPU Resource Management & Development Environment Platform**
 
-## Components
+AI_SW_IDE is a Kubernetes-native platform that provides GPU resource monitoring, allocation, and user-initiated development environment provisioning.
 
-### Backend (`AI_SW_IDE/backend/`)
-- **Tech Stack**: FastAPI, Python, PostgreSQL, SQLAlchemy
-- **Features**: Server Management, GPU Resource Management, Storage Management, etc
-- **Documentation**: [Backend README](AI_SW_IDE/backend/README.md)
+#### Core Concept
 
-### Frontend (`AI_SW_IDE/frontend/`)
-- **Tech Stack**: React, Vite, TailwindCSS
-- **Features**: Web dashboard UI, GPU Server Creation, Real-time Monitoring, Storage Management, etc
-- **Documentation**: [Frontend README](AI_SW_IDE/frontend/README.md)
+- **Purpose**: Self-service GPU resource management and user-initiated development environment provisioning in Kubernetes clusters
+- **Target Environment**: Kubernetes clusters with GPU nodes
+- **Primary Use Case**: AI/ML researchers and developers who need on-demand GPU-accelerated development environments (Jupyter Lab)
 
-### Data Observer (`AI_SW_IDE/data_observer/`)
-- **Tech Stack**: FastAPI, Python
-- **Features**: NFS Volume Directory Browsing 
+#### Key Characteristics
 
-### Helm Chart (`AI_SW_IDE/helm-chart/`)
-- Subchart-based architecture (Backend, Frontend, Data Observer)
-- Automatic Bitnami PostgreSQL installation
+1. **GPU Resource Management**
+   - Real-time GPU monitoring 
+   - Node resource monitoring (CPU,memoryu) from Prometheus
+   - User-selected GPU allocation (MIG and full GPU support)
+   - Resource availability tracking
+
+2. **User-Initiated Development Environment Provisioning**
+   - Kubernetes Pod-based development environment server creation (supports various containerized IDEs: Jupyter Lab, VSCode, etc.)
+   - Resource selection from predefined options (CPU, Memory, GPU)
+   - Custom container image and command configuration
+   - Manual environment deletion with resource reclamation
+
+3. **Multi-Tenant Resource Isolation**
+   - Per-user resource ownership and access control
+   - JWT-based authentication and authorization
+
+4. **Storage Management Integration**
+   - PersistentVolumeClaim (PVC) creation and deletion
+   - NFS volume mounting and file system browsing
+
+5. **Kubernetes-Native Architecture**
+   - Direct Kubernetes API integration for resource management
+   - Helm-based deployment with subchart architecture
+   - Prometheus metrics integration for monitoring
+
+#### Operational Scope
+
+- **Resource Types**: GPU nodes, Kubernetes Pods, PersistentVolumes
+- **Monitoring**: GPU utilization, node resources, pod status
+- **Provisioning**: User-initiated creation of containerized development environment servers with GPU acceleration (configurable IDE/editor)
+- **Storage**: NFS and PVC-based persistent storage
 
   
