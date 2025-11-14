@@ -17,7 +17,7 @@ const Sidebar = () => {
         {
           icon: <HomeIcon className="h-5 w-5" />,
           name: "Home",
-          path: "/admin/home",  // ✅ 현재 위치 (즉, index route)
+          path: "/admin/home",  // ✅ Current location (i.e., index route)
         },
       ],
     },

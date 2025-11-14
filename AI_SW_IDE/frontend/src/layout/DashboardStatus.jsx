@@ -13,7 +13,7 @@ const DashboardStatus = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  // 데이터를 불러오는 함수
+  // Function to fetch data
   const fetchData = async () => {
     try {
       const response = await fetchWithAuth('/metrics/gpu-resource');
@@ -30,15 +30,15 @@ const DashboardStatus = () => {
   };
 
   useEffect(() => {
-    // 컴포넌트 마운트 시 즉시 데이터 호출
+    // Call data immediately on component mount
     fetchData();
 
-    // 폴링(15초마다 한 번씩 fetchData 실행)
+    // Polling (execute fetchData every 15 seconds)
     const interval = setInterval(() => {
       fetchData();
     }, 15000);
 
-    // 언마운트 시 interval 정리
+    // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, []);
 
@@ -74,3 +74,4 @@ const DashboardStatus = () => {
 };
 
 export default DashboardStatus;
+

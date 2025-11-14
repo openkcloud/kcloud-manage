@@ -8,7 +8,7 @@ import GPUNode from '../components/GPUNode';
 
 const DashboardPod = () => {
   const [data, setData] = useState({
-    nodeList: ['worker1', 'worker2'], // 초기값 (API 호출 시 변경 가능)
+    nodeList: ['worker1', 'worker2'], // Initial value (can be changed when API is called)
     gpuData: {
       'worker1': {
         0: [

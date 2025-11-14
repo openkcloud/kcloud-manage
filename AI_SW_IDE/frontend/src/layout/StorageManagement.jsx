@@ -15,7 +15,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { fetchWithAuth } from "@/utils/auth";
 
-// PVC 목록 카드 컴포넌트
+// PVC list card component
 function PVCCard({ pvc, onSelect }) {
   return (
     <Card 
@@ -40,12 +40,12 @@ function PVCCard({ pvc, onSelect }) {
   );
 }
 
-// 파일 브라우저 컴포넌트
+// File browser component
 function FileBrowser({ pvcId, pvcName, pvcPath, onBack }) {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // URL에서 현재 파일 경로 추출
+  // Extract current file path from URL
   const urlParams = new URLSearchParams(location.search);
   const currentPath = urlParams.get('path') || pvcPath;
   
@@ -58,13 +58,13 @@ function FileBrowser({ pvcId, pvcName, pvcPath, onBack }) {
     try {
       const response = await fetchWithAuth(`/server/browse?pvc_id=${pvcId}&path=${encodeURIComponent(path)}`);
       if (!response.ok) {
-        throw new Error('파일 목록을 불러올 수 없습니다');
+        throw new Error('Unable to load file list');
       }
       const data = await response.json();
       setFileData(data);
       setEntries(data.items || []);
     } catch (error) {
-      console.error("파일 목록 불러오기 실패:", error);
+      console.error("Failed to load file list:", error);
       setEntries([]);
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ function FileBrowser({ pvcId, pvcName, pvcPath, onBack }) {
   };
 
   const handleBack = () => {
-    // 현재 경로가 PVC의 기본 경로와 같거나 더 짧으면 PVC 목록으로 돌아가기
+    // Return to PVC list if current path equals or is shorter than PVC's base path
     if (currentPath === pvcPath || currentPath.length <= pvcPath.length) {
       onBack();
       return;
@@ -91,17 +91,17 @@ function FileBrowser({ pvcId, pvcName, pvcPath, onBack }) {
     const pvcSegments = pvcPath.split('/').filter(Boolean);
     const currentSegments = currentPath.split('/').filter(Boolean);
     
-    // 현재 경로가 PVC 경로보다 긴 경우에만 뒤로가기 허용
+    // Only allow going back if current path is longer than PVC path
     if (currentSegments.length > pvcSegments.length) {
-      // 절대 경로로 부모 경로 생성 (맨 앞에 / 추가)
+      // Create parent path as absolute path (add / at the beginning)
       const parentPath = '/' + currentSegments.slice(0, -1).join('/');
       
-      // 부모 경로가 PVC 경로보다 짧아지지 않도록 확인
+      // Ensure parent path is not shorter than PVC path
       if (parentPath.length >= pvcPath.length) {
         const newUrl = `${location.pathname}?pvc_id=${pvcId}&path=${encodeURIComponent(parentPath)}`;
         navigate(newUrl);
       } else {
-        // PVC 기본 경로로 돌아가기
+        // Return to PVC base path
         const newUrl = `${location.pathname}?pvc_id=${pvcId}&path=${encodeURIComponent(pvcPath)}`;
         navigate(newUrl);
       }
@@ -114,7 +114,7 @@ function FileBrowser({ pvcId, pvcName, pvcPath, onBack }) {
     <Card className="p-6 rounded-xl shadow-md border border-blue-gray-100 bg-white w-full">
       <div className="mb-4">
         <Typography variant="h5" color="blue-gray">
-          {pvcName} - 파일 탐색기
+          {pvcName} - File Explorer
         </Typography>
       </div>
       
@@ -128,13 +128,13 @@ function FileBrowser({ pvcId, pvcName, pvcPath, onBack }) {
             <ChevronLeftIcon className="w-5 h-5 text-gray-500" />
           </IconButton>
                    <Typography color="blue-gray">
-           {currentPath === pvcPath ? "최상위 경로" : currentPath.replace(pvcPath, '')}
+           {currentPath === pvcPath ? "Top-level path" : currentPath.replace(pvcPath, '')}
          </Typography>
         </div>
         
         {fileData && (
           <div className="text-sm text-gray-600">
-            총 {fileData.total_items}개 항목 | {fileData.total_size_human}
+            Total {fileData.total_items} items | {fileData.total_size_human}
           </div>
         )}
       </div>
@@ -145,7 +145,7 @@ function FileBrowser({ pvcId, pvcName, pvcPath, onBack }) {
             <Spinner color="blue" />
           </div>
         ) : entries.length === 0 ? (
-          <div className="text-center text-gray-500 py-10">비어 있습니다</div>
+          <div className="text-center text-gray-500 py-10">Empty</div>
         ) : (
           entries.map((entry) => (
             <div
@@ -181,12 +181,12 @@ function FileBrowser({ pvcId, pvcName, pvcPath, onBack }) {
   );
 }
 
-// 메인 StorageManagement 컴포넌트
+// Main StorageManagement component
 export default function StorageManagement() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // URL에서 PVC ID 추출
+  // Extract PVC ID from URL
   const urlParams = new URLSearchParams(location.search);
   const selectedPvcId = urlParams.get('pvc_id');
   
@@ -199,12 +199,12 @@ export default function StorageManagement() {
     try {
       const response = await fetchWithAuth('/server/my-pvcs');
       if (!response.ok) {
-        throw new Error('PVC 목록을 불러올 수 없습니다');
+        throw new Error('Unable to load PVC list');
       }
       const data = await response.json();
       setPvcList(data.pvcs || []);
       
-      // URL에 PVC ID가 있으면 해당 PVC 선택
+      // Select the PVC if PVC ID exists in URL
       if (selectedPvcId) {
         const pvc = data.pvcs.find(p => p.id.toString() === selectedPvcId);
         if (pvc) {
@@ -212,7 +212,7 @@ export default function StorageManagement() {
         }
       }
     } catch (error) {
-      console.error("PVC 목록 불러오기 실패:", error);
+      console.error("Failed to load PVC list:", error);
       setPvcList([]);
     } finally {
       setLoading(false);
@@ -234,7 +234,7 @@ export default function StorageManagement() {
     navigate(location.pathname);
   };
 
-  // PVC가 선택되었으면 파일 브라우저 표시
+  // Display file browser if PVC is selected
   if (selectedPvc) {
     return (
       <FileBrowser 
@@ -246,15 +246,15 @@ export default function StorageManagement() {
     );
   }
 
-  // PVC 목록 표시
+  // Display PVC list
   return (
     <div className="p-6">
       <div className="mb-6">
         <Typography variant="h4" color="blue-gray" className="font-bold">
-          스토리지 관리
+          Storage Management
         </Typography>
         <Typography variant="small" color="gray" className="mt-2">
-          PVC를 선택하여 파일을 탐색하세요
+          Select a PVC to explore files
         </Typography>
       </div>
 
@@ -265,7 +265,7 @@ export default function StorageManagement() {
       ) : pvcList.length === 0 ? (
         <Card className="p-8 text-center">
           <Typography color="gray">
-            사용 가능한 PVC가 없습니다
+            No available PVCs
           </Typography>
         </Card>
       ) : (
