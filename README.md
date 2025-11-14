@@ -36,11 +36,3 @@ kcloud-manage/
 - Automatic Bitnami PostgreSQL installation
 
   
-## Prerequisites
-
-- Kubernetes cluster (1.19+)
-- Helm 3.2.0+
-- DCGM Exporter
-- Prometheus
-- NFS server 
-
