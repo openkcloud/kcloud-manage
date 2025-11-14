@@ -5,7 +5,7 @@ import { Typography, Input, Button } from "@material-tailwind/react";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
 // import { loginUser } from "../utils/mockAuth";
 
-// Base64 URL 인코딩 함수
+// Base64 URL encoding function
 const base64url = (source) => {
   return btoa(source)
     .replace(/=+$/, '')
@@ -55,26 +55,26 @@ export function SignInPage() {
     try {
       const result = await loginUser(email, password);
 
-      // 사용자 정보 저장
+      // Save user information
       localStorage.setItem("user", JSON.stringify(result.user));
       localStorage.setItem("access_token", result.access_token); 
       document.cookie = `access_token=${result.token}; path=/; secure; samesite=strict`;
 
-      // // 가짜 JWT 토큰 생성 (만료시간 1시간 후)
+      // // Generate dummy JWT token (expires in 1 hour)
       // const dummyPayload = { exp: Math.floor(Date.now() / 1000) + 3600 };
       // const base64Payload = base64url(JSON.stringify(dummyPayload));
       // const dummyToken = `dummyHeader.${base64Payload}.dummySignature`;
       // localStorage.setItem("token", dummyToken);
       
 
-      // 사용자 역할에 따라 리디렉션 처리
+      // Redirect based on user role
       if (result.user.role === "admin") {    
         navigate("/admin/home");     
       } else {
         navigate("/user/dashboard");
       }
     } catch (err) {
-      console.error("로그인 에러:", err);
+      console.error("Login error:", err);
       setError(err.message || "Login failed");
       setIsLoading(false);
     }
@@ -170,7 +170,7 @@ export function SignInPage() {
         </div>
       </div>
 
-      {/* 오른쪽 정보 섹션 */}
+      {/* Right information section */}
       <div className="hidden md:flex flex-col justify-center p-12 bg-black bg-[url('https://www.material-tailwind.com/image/dark-image.png')] bg-cover bg-center rounded-tl-3xl rounded-bl-3xl">
         <Typography variant="h3" className="mb-2 text-4xl font-bold text-white">
           Welcome to
@@ -182,18 +182,17 @@ export function SignInPage() {
           AI Software IDE!
         </Typography>
         <Typography className="mb-20 text-white leading-loose">
-          AI_SW_IDE는 사용 중인 GPU 자원을 실시간으로 모니터링하고, 사용 가능한 GPU 서버를 직접 배포하실 수 있는 웹 페이지입니다.
-          GPU의 사용량, 메모리 상태 등을 한눈에 확인하실 수 있으며, 원하는 설정에 맞춰 새로운 GPU 서버를 손쉽게 생성하실 수 있어 연구나 개발 환경에서
-          자원을 보다 효율적으로 관리하고 활용하실 수 있습니다.
+          AI SOFTWARE IDE is a web page that monitors GPU resources in real-time and allows you to directly deploy available GPU servers.
+          You can check GPU usage and memory status at a glance, and easily create new GPU servers with your desired settings, enabling more efficient management and utilization of resources in research or development environments.
         </Typography>
         <Typography className="mb-10 text-white">
-          <strong className="underline">만든이 및 관리</strong>
+          <strong className="underline">Created by</strong>
           <br />
-          오케스트로 &gt; 인공지능연구소 &gt; AI응용팀 &gt; AI응용파트 &gt; <strong className="text-blue-300">yb.jo</strong>
+          Okestro &gt; AI Research Institute &gt; AI Application Team &gt; AI Application Part &gt; <strong className="text-blue-300">yb.jo</strong>
         </Typography>
 
         <div className="flex items-center gap-2 text-white">
-          <span className="text-yellow-400 text-xl">★★★★★★★★</span>
+          <span className="text-yellow-400 text-xl"></span>
           <Typography>Openkcloud</Typography>
         </div>
       </div>

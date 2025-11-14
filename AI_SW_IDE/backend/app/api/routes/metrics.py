@@ -25,28 +25,28 @@ router = APIRouter()
 
 
 async def get_gpu_node_resources(db: Session):
-    """노드별 GPU 리소스 사용량을 계산합니다."""
+    """Calculate GPU resource usage per node."""
     
-    # gpu_flavor 테이블에서 모든 GPU 정보 조회
+    # Query all GPU information from gpu_flavor table
     flavors = db.query(Flavor).all()
     
-    # 노드별, GPU 타입별로 집계
+    # Aggregate by node and GPU type
     gpu_stats = defaultdict(lambda: defaultdict(lambda: {"total": 0, "in_use": 0, "free": 0}))
     
     for flavor in flavors:
         node_name = flavor.worker_node.strip()  # 공백 제거
         gpu_name = flavor.gpu_name
         
-        # 총 개수 증가
+        # Increment total count
         gpu_stats[node_name][gpu_name]["total"] += 1
         
-        # 사용 중인지 확인 (server_gpu_mapping 테이블 확인)
+        # Check if in use (check server_gpu_mapping table)
         mapping = db.query(ServerGpuMapping).filter(
             ServerGpuMapping.gpu_id == flavor.id
         ).first()
         
         if mapping:
-            # 서버가 실제로 Running 상태인지 확인
+            # Check if server is actually in Running status
             server = db.query(PodCreation).filter(
                 PodCreation.id == mapping.server_id,
                 PodCreation.status == "Running"
@@ -55,7 +55,7 @@ async def get_gpu_node_resources(db: Session):
             if server:
                 gpu_stats[node_name][gpu_name]["in_use"] += 1
         
-        # 사용 가능한 개수 계산
+        # Calculate available count
         gpu_stats[node_name][gpu_name]["free"] = (
             gpu_stats[node_name][gpu_name]["total"] - 
             gpu_stats[node_name][gpu_name]["in_use"]
@@ -76,18 +76,18 @@ async def get_node_resources(db: Session = Depends(get_db)):
     mem_total = {item["metric"]["node"]: float(item["value"][1]) / (1024**3) for item in mem_total_res}
     mem_used = {item["metric"]["node"]: float(item["value"][1]) / (1024**3) for item in mem_used_res}
 
-    # GPU 정보 수집
+    # Collect GPU information
     gpu_data = await get_gpu_node_resources(db)
 
     result = []
     for node in NODE_NAMES.split(','):
-        node = node.strip()  # 노드명 공백 제거
+        node = node.strip()  # Remove whitespace from node name
         c_total = cpu_total.get(node, 0)
         c_used = cpu_used.get(node, 0)
         m_total = mem_total.get(node, 0)
         m_used = mem_used.get(node, 0)
 
-        # 해당 노드의 GPU 정보 변환
+        # Convert GPU information for this node
         node_gpu_list = []
         if node in gpu_data:
             for gpu_name, stats in gpu_data[node].items():
@@ -116,39 +116,39 @@ async def get_node_resources(db: Session = Depends(get_db)):
 
 @router.get("/gpu-resource")
 async def get_gpu_resource(db: Session = Depends(get_db)):
-    """DB에서 GPU 리소스 정보를 조회하여 실제 사용자와 상태 정보를 포함한 응답을 반환"""
+    """Query GPU resource information from DB and return response including actual user and status information"""
     
     node_set = set()
     gpu_data = defaultdict(lambda: defaultdict(list))
 
-    # gpu_flavor 테이블에서 모든 GPU 정보 조회
+    # Query all GPU information from gpu_flavor table
     flavors = db.query(Flavor).all()
     
     for flavor in flavors:
         node_name = flavor.worker_node
         gpu_id = str(flavor.gpu_id)
         
-        # MIG 여부에 따라 compute 값 계산
+        # Calculate compute value based on MIG presence
         if flavor.mig_id is not None:
-            # MIG 인스턴스 - flavor 이름에서 숫자 추출
+            # MIG instance - extract number from flavor name
             compute = int(re.search(r'\d+', flavor.gpu_name)[0]) if re.search(r'\d+', flavor.gpu_name) else 0
         else:
             # Non-MIG GPU
             compute = 0
         
-        # server_gpu_mapping을 통해 할당된 서버 찾기
+        # Find assigned server through server_gpu_mapping
         mapping = db.query(ServerGpuMapping).filter(
             ServerGpuMapping.gpu_id == flavor.id
         ).first()
         
         if mapping:
-            # 할당된 서버가 있는 경우
+            # If server is assigned
             server = db.query(PodCreation).filter(
                 PodCreation.id == mapping.server_id
             ).first()
             
             if server:
-                # 사용자 정보 조회
+                # Query user information
                 user_obj = db.query(User).filter(User.id == server.user_id).first()
                 user = user_obj.name if user_obj else 'Unknown'
                 status = 'RUNNING' if server.status == 'Running' else server.status
@@ -156,7 +156,7 @@ async def get_gpu_resource(db: Session = Depends(get_db)):
                 user = 'EMPTY'
                 status = 'EMPTY'
         else:
-            # 할당되지 않은 GPU
+            # Unassigned GPU
             user = 'EMPTY'
             status = 'EMPTY'
 
@@ -191,7 +191,7 @@ async def update_gpu_resource(db: Session = Depends(get_db)):
         for container in containers:
             resources = container.resources
             limits = resources.limits or {}
-            # NVIDIA GPU 리소스 요청 확인
+            # Check for NVIDIA GPU resource requests
             for key, value in limits.items():
                 if key.startswith("nvidia.com/") and int(value) > 0:
                     split_pod_name = pod.metadata.name.split('-')
@@ -220,6 +220,6 @@ async def update_gpu_resource(db: Session = Depends(get_db)):
     
 @router.post("/sync-gpu-flavors")
 async def sync_gpu_flavors():
-    await sync_flavors_to_db()  # gpu_flavor 테이블 동기화
-    await sync_gpu_pod_status_from_prometheus()  # servers 테이블 동기화
+    await sync_flavors_to_db()  # Synchronize gpu_flavor table
+    await sync_gpu_pod_status_from_prometheus()  # Synchronize servers table
     return {"message": "GPU flavors and servers synced successfully"}

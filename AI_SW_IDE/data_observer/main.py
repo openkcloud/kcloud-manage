@@ -10,17 +10,17 @@ from pydantic import BaseModel
 
 app = FastAPI(
     title="Data Observer API",
-    description="NFS 볼륨의 데이터 상태를 모니터링하는 API",
+    description="API for monitoring data status of NFS volumes",
     version="1.0.0"
 )
 
-# NFS 볼륨 마운트 포인트
+# NFS volume mount point
 NFS_ROOT = os.getenv("NFS_ROOT", "/home/jovyan")
 
 class FileInfo(BaseModel):
     name: str
     type: str  # 'file' or 'directory'
-    extension: Optional[str] = None  # 파일 확장자 (디렉터리는 None)
+    extension: Optional[str] = None  # File extension (None for directories)
     size: int  # bytes
     size_human: str  # human readable size
     modified: datetime
@@ -34,7 +34,7 @@ class DirectoryResponse(BaseModel):
     items: List[FileInfo]
 
 def get_human_readable_size(size_bytes: int) -> str:
-    """바이트를 사람이 읽기 쉬운 형태로 변환"""
+    """Convert bytes to human-readable format"""
     if size_bytes == 0:
         return "0B"
     
@@ -47,35 +47,35 @@ def get_human_readable_size(size_bytes: int) -> str:
     return f"{size_bytes:.1f}{size_names[i]}"
 
 def get_file_info(file_path: Path, calculate_dir_size: bool = False) -> FileInfo:
-    """파일/디렉터리 정보를 가져옴"""
+    """Get file/directory information"""
     try:
         stat_info = file_path.stat()
         
-        # 파일 타입 결정
+        # Determine file type
         file_type = "directory" if file_path.is_dir() else "file"
         
-        # 크기 계산
+        # Calculate size
         if file_type == "file":
             size = stat_info.st_size
         elif file_type == "directory" and calculate_dir_size:
-            # 디렉터리의 경우 하위 모든 파일 크기 계산
+            # Calculate size of all files in directory
             size = calculate_directory_size(file_path)
         else:
-            # 디렉터리지만 계산하지 않는 경우
+            # Directory but not calculating size
             size = 0
         
-        # 확장자 추출
+        # Extract extension
         extension = None
         if file_type == "file":
             name_parts = file_path.name.rsplit('.', 1)
             if len(name_parts) > 1:
                 extension = name_parts[1]
         
-        # 권한 정보
+        # Permission information
         mode = stat_info.st_mode
         permissions = stat.filemode(mode)
         
-        # 수정 시간
+        # Modified time
         modified = datetime.fromtimestamp(stat_info.st_mtime)
         
         return FileInfo(
@@ -88,22 +88,22 @@ def get_file_info(file_path: Path, calculate_dir_size: bool = False) -> FileInfo
             permissions=permissions
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"파일 정보를 가져올 수 없습니다: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unable to get file information: {str(e)}")
 
 def vscode_sort(items: List[FileInfo]) -> List[FileInfo]:
-    """VSCode 스타일 정렬: 디렉터리 먼저, 그 다음 파일들을 이름순으로"""
+    """VSCode-style sorting: directories first, then files sorted by name"""
     directories = [item for item in items if item.type == "directory"]
     files = [item for item in items if item.type == "file"]
     
-    # 각각을 이름순으로 정렬 (대소문자 구분 없이)
+    # Sort each by name (case-insensitive)
     directories.sort(key=lambda x: x.name.lower())
     files.sort(key=lambda x: x.name.lower())
     
-    # 디렉터리 먼저, 그 다음 파일
+    # Directories first, then files
     return directories + files
 
 def calculate_directory_size(directory_path: Path) -> int:
-    """디렉터리의 총 크기를 계산 (하위 디렉터리 포함)"""
+    """Calculate total size of directory (including subdirectories)"""
     total_size = 0
     try:
         for item in directory_path.rglob('*'):
@@ -126,38 +126,38 @@ def root():
 
 @app.get("/browse", response_model=DirectoryResponse)
 def browse_directory(
-    path: str = Query("/", description="브라우징할 경로 (NFS 루트 상대경로)"),
-    include_hidden: bool = Query(False, description="숨김 파일 포함 여부"),
-    sort_by: str = Query("vscode", description="정렬 기준: vscode, name, size, modified, type"),
-    calculate_dir_size: bool = Query(True, description="디렉터리의 실제 크기를 계산할지 여부 (시간이 오래 걸릴 수 있음)")
+    path: str = Query("/", description="Path to browse (relative to NFS root)"),
+    include_hidden: bool = Query(False, description="Include hidden files"),
+    sort_by: str = Query("vscode", description="Sort criteria: vscode, name, size, modified, type"),
+    calculate_dir_size: bool = Query(True, description="Whether to calculate actual directory size (may take time)")
 ):
-    """지정된 경로의 디렉터리 내용을 반환"""
+    """Return directory contents of the specified path"""
     
-    # 경로 정규화 및 보안 검증
+    # Path normalization and security validation
     if path.startswith("/"):
-        path = path[1:]  # 앞의 / 제거
+        path = path[1:]  # Remove leading /
     
-    # .. 경로 조작 방지
+    # Prevent .. path manipulation
     if ".." in path:
-        raise HTTPException(status_code=400, detail="상위 디렉터리 접근은 허용되지 않습니다")
+        raise HTTPException(status_code=400, detail="Access to parent directory is not allowed")
     
     full_path = Path(NFS_ROOT) / path
     
-    # 경로 존재 여부 확인
+    # Check if path exists
     if not full_path.exists():
-        raise HTTPException(status_code=404, detail=f"경로를 찾을 수 없습니다: {path}")
+        raise HTTPException(status_code=404, detail=f"Path not found: {path}")
     
-    # 디렉터리인지 확인
+    # Check if it's a directory
     if not full_path.is_dir():
-        raise HTTPException(status_code=400, detail=f"지정된 경로는 디렉터리가 아닙니다: {path}")
+        raise HTTPException(status_code=400, detail=f"Specified path is not a directory: {path}")
     
     try:
-        # 디렉터리 항목 수집
+        # Collect directory items
         items = []
         total_size = 0
         
         for item in full_path.iterdir():
-            # 숨김 파일 처리
+            # Handle hidden files
             if not include_hidden and item.name.startswith('.'):
                 continue
             
@@ -165,15 +165,15 @@ def browse_directory(
                 file_info = get_file_info(item, calculate_dir_size)
                 items.append(file_info)
                 
-                # 파일인 경우 크기 누적
+                # Accumulate size for files
                 if file_info.type == "file":
                     total_size += file_info.size
                     
             except Exception as e:
-                print(f"파일 정보 가져오기 실패: {item.name}, 오류: {e}")
+                print(f"Failed to get file information: {item.name}, error: {e}")
                 continue
         
-        # 정렬
+        # Sort
         if sort_by == "vscode":
             items = vscode_sort(items)
         else:
@@ -181,7 +181,7 @@ def browse_directory(
                 "name": lambda x: x.name.lower(),
                 "size": lambda x: x.size,
                 "modified": lambda x: x.modified,
-                "type": lambda x: (x.type, x.name.lower())  # 디렉터리 먼저, 그다음 이름순
+                "type": lambda x: (x.type, x.name.lower())  # Directories first, then by name
             }
             
             if sort_by in sort_key_map:
@@ -196,30 +196,30 @@ def browse_directory(
         )
         
     except PermissionError:
-        raise HTTPException(status_code=403, detail="디렉터리에 접근할 권한이 없습니다")
+        raise HTTPException(status_code=403, detail="No permission to access directory")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"디렉터리를 읽을 수 없습니다: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unable to read directory: {str(e)}")
 
 @app.get("/info")
-def get_path_info(path: str = Query("/", description="정보를 조회할 경로")):
-    """특정 경로의 상세 정보 반환"""
+def get_path_info(path: str = Query("/", description="Path to query information for")):
+    """Return detailed information for a specific path"""
     
-    # 경로 정규화 및 보안 검증
+    # Path normalization and security validation
     if path.startswith("/"):
         path = path[1:]
     
     if ".." in path:
-        raise HTTPException(status_code=400, detail="상위 디렉터리 접근은 허용되지 않습니다")
+        raise HTTPException(status_code=400, detail="Access to parent directory is not allowed")
     
     full_path = Path(NFS_ROOT) / path
     
     if not full_path.exists():
-        raise HTTPException(status_code=404, detail=f"경로를 찾을 수 없습니다: {path}")
+        raise HTTPException(status_code=404, detail=f"Path not found: {path}")
     
     try:
-        file_info = get_file_info(full_path, True)  # /info 엔드포인트에서는 항상 디렉터리 크기 계산
+        file_info = get_file_info(full_path, True)  # Always calculate directory size for /info endpoint
         
-        # 디렉터리인 경우 하위 항목 수와 총 크기 계산
+        # Calculate number of child items and total size for directories
         additional_info = {}
         if full_path.is_dir():
             try:
@@ -231,7 +231,7 @@ def get_path_info(path: str = Query("/", description="정보를 조회할 경로
                     "directory_size_human": get_human_readable_size(dir_size)
                 })
             except PermissionError:
-                additional_info["error"] = "하위 디렉터리 접근 권한 없음"
+                additional_info["error"] = "No permission to access subdirectories"
         
         return {
             "path": f"/{path}" if path else "/",
@@ -240,11 +240,11 @@ def get_path_info(path: str = Query("/", description="정보를 조회할 경로
         }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"파일 정보를 가져올 수 없습니다: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unable to get file information: {str(e)}")
 
 @app.get("/health")
 def health_check():
-    """헬스 체크 엔드포인트"""
+    """Health check endpoint"""
     nfs_accessible = os.path.exists(NFS_ROOT) and os.access(NFS_ROOT, os.R_OK)
     
     return {

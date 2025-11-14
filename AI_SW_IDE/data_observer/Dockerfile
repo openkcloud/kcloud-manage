@@ -2,22 +2,22 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# 시스템 의존성 설치
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
-# Python 의존성 설치
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 애플리케이션 코드 복사
+# Copy application code
 COPY main.py .
 
-# NFS 마운트 포인트 생성
+# Create NFS mount point
 RUN mkdir -p /nfsvolume
 
-# 포트 노출
+# Expose port
 EXPOSE 8000
 
-# 애플리케이션 실행
+# Run application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"] 

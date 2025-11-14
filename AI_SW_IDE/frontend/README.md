@@ -1,16 +1,16 @@
-# AI_SW_IDE Frontend
+# AI SOFTWARE IDE Frontend
 
-GPU 클러스터 관리를 위한 웹 대시보드의 프론트엔드 애플리케이션입니다. React와 Material Tailwind를 기반으로 구축되었으며, GPU 서버 생성, 모니터링, 스토리지 관리 등의 기능을 제공합니다.
+Frontend application for the web dashboard for GPU cluster management. Built with React and Material Tailwind, providing features such as GPU server creation, monitoring, and storage management.
 
-## 🚀 주요 기능
+## 🚀 Key Features
 
-- **GPU 서버 생성**: CPU, Memory, GPU 자원을 선택하여 서버 생성
-- **실시간 모니터링**: GPU 클러스터 상태 및 실행 중인 Pod 모니터링
-- **스토리지 관리**: PVC 기반 파일 시스템 탐색 및 관리
-- **사용자 인증**: JWT 기반 로그인/로그아웃 시스템
-- **반응형 UI**: 모든 디바이스에서 최적화된 사용자 경험
+- **GPU Server Creation**: Create servers by selecting CPU, Memory, and GPU resources
+- **Real-time Monitoring**: Monitor GPU cluster status and running Pods
+- **Storage Management**: Explore and manage PVC-based file systems
+- **User Authentication**: JWT-based login/logout system
+- **Responsive UI**: Optimized user experience across all devices
 
-## 🛠 기술 스택
+## 🛠 Tech Stack
 
 - **Frontend Framework**: React 19.0.0
 - **Build Tool**: Vite 6.1.0
@@ -20,146 +20,146 @@ GPU 클러스터 관리를 위한 웹 대시보드의 프론트엔드 애플리�
 - **Routing**: React Router DOM 7.4.0
 - **Authentication**: JWT Decode 4.0.0
 
-## 📁 프로젝트 구조
+## 📁 Project Structure
 
 ```
 src/
-├── components/          # 재사용 가능한 UI 컴포넌트
-│   ├── Secure/         # 인증 관련 컴포넌트
-│   ├── ExpendingRadioButton.jsx  # 서버 생성 폼
-│   ├── RunningPodTable.jsx       # 실행 중인 Pod 테이블
-│   ├── MyServerCard.jsx          # 서버 카드 컴포넌트
-│   ├── Navbar.jsx               # 네비게이션 바
-│   ├── Sidebar.jsx              # 사이드바
-│   ├── SignIn.jsx               # 로그인 컴포넌트
-│   ├── GPUComponent.jsx         # GPU 관련 컴포넌트
-│   ├── GPUNode.jsx              # GPU 노드 표시
-│   ├── Loading.jsx              # 로딩 스피너
+├── components/          # Reusable UI components
+│   ├── Secure/         # Authentication related components
+│   ├── ExpendingRadioButton.jsx  # Server creation form
+│   ├── RunningPodTable.jsx       # Running Pod table
+│   ├── MyServerCard.jsx          # Server card component
+│   ├── Navbar.jsx               # Navigation bar
+│   ├── Sidebar.jsx              # Sidebar
+│   ├── SignIn.jsx               # Login component
+│   ├── GPUComponent.jsx         # GPU related component
+│   ├── GPUNode.jsx              # GPU node display
+│   ├── Loading.jsx              # Loading spinner
 │   └── ...
-├── layout/             # 레이아웃 컴포넌트
-│   ├── DashboardStatus.jsx      # 대시보드 메인 화면
-│   ├── CreatePod.jsx            # 서버 생성 페이지
-│   ├── MyServer.jsx             # 내 서버 관리
-│   ├── StorageManagement.jsx    # 스토리지 관리
-│   └── Sidebar.jsx              # 레이아웃용 사이드바
-├── pages/              # 페이지 컴포넌트
-│   ├── SignInPage.jsx           # 로그인 페이지
-│   ├── AdminDashboard.jsx       # 관리자 대시보드
-│   └── UserDashboard.jsx        # 사용자 대시보드
-├── utils/              # 유틸리티 함수
-│   ├── auth.js                  # 인증 관련 함수
-│   └── mockAuth.jsx             # 모킹용 인증
-├── context/            # React Context 설정
-├── assets/             # 정적 자원
-├── public/             # Public 파일
-├── App.jsx             # 메인 앱 컴포넌트
-├── main.jsx            # 엔트리 포인트
-└── index.css           # 글로벌 CSS
+├── layout/             # Layout components
+│   ├── DashboardStatus.jsx      # Dashboard main screen
+│   ├── CreatePod.jsx            # Server creation page
+│   ├── MyServer.jsx             # My server management
+│   ├── StorageManagement.jsx    # Storage management
+│   └── Sidebar.jsx              # Layout sidebar
+├── pages/              # Page components
+│   ├── SignInPage.jsx           # Login page
+│   ├── AdminDashboard.jsx       # Admin dashboard
+│   └── UserDashboard.jsx        # User dashboard
+├── utils/              # Utility functions
+│   ├── auth.js                  # Authentication related functions
+│   └── mockAuth.jsx             # Mock authentication
+├── context/            # React Context configuration
+├── assets/             # Static assets
+├── public/             # Public files
+├── App.jsx             # Main app component
+├── main.jsx            # Entry point
+└── index.css           # Global CSS
 ```
 
-## 🔧 설치 및 실행
+## 🔧 Installation and Execution
 
-### 필수 요구사항
+### Prerequisites
 - Node.js 18+ 
-- npm 또는 yarn
+- npm or yarn
 
-### 설치
+### Installation
 ```bash
-# 의존성 설치
+# Install dependencies
 npm install
 ```
 
-### 개발 서버 실행
+### Development Server
 ```bash
-# 개발 모드로 실행 (포트 4000)
+# Run in development mode (port 4000)
 npm run dev
 ```
-브라우저에서 `http://localhost:4000`으로 접속
+Access via `http://localhost:4000` in your browser
 
-### 빌드
+### Build
 ```bash
-# 프로덕션 빌드
+# Production build
 npm run build
 ```
 
-### 린트 검사
+### Lint Check
 ```bash
-# ESLint 실행
+# Run ESLint
 npm run lint
 ```
 
-## 🌐 환경 변수
+## 🌐 Environment Variables
 
-`.env` 파일을 생성하여 다음 환경변수를 설정하세요:
+Create a `.env` file and set the following environment variables:
 
 ```env
-VITE_API_URL=http://localhost:8000  # 백엔드 API URL
+VITE_API_URL=http://localhost:8000  # Backend API URL
 ```
 
-## 📝 주요 컴포넌트 설명
+## 📝 Main Component Descriptions
 
-### 1. 대시보드 (DashboardStatus)
-- GPU 클러스터 전체 상태 모니터링
-- 노드별 GPU, CPU, Memory 사용량 표시
-- 실시간 업데이트 (15초 간격)
+### 1. Dashboard (DashboardStatus)
+- Monitor overall GPU cluster status
+- Display GPU, CPU, Memory usage per node
+- Real-time updates (15-second interval)
 
-### 2. 서버 생성 (ExpendingRadioButton)
-- 단계별 하드웨어 선택 (CPU → Memory → GPU)
-- PVC 선택 (신규 생성 또는 기존 사용)
-- 서버 이름 및 설명 입력
+### 2. Server Creation (ExpendingRadioButton)
+- Step-by-step hardware selection (CPU → Memory → GPU)
+- PVC selection (create new or use existing)
+- Server name and description input
 
-### 3. 스토리지 관리 (StorageManagement)
-- PVC 목록 표시
-- 파일 시스템 탐색
-- 폴더/파일 정보 표시
+### 3. Storage Management (StorageManagement)
+- Display PVC list
+- File system exploration
+- Folder/file information display
 
-### 4. 실행 중인 서버 테이블 (RunningPodTable)
-- TAG 기반 서버 분류 (JUPYTER, LEGEND, DEV)
-- 사용자, 자원 사용량, 생성일 표시
-- 실시간 업데이트 (60초 간격)
+### 4. Running Server Table (RunningPodTable)
+- Server classification by TAG (JUPYTER, LEGEND, DEV)
+- Display user, resource usage, creation date
+- Real-time updates (60-second interval)
 
-## 🔐 인증 시스템
+## 🔐 Authentication System
 
-- JWT 기반 토큰 인증
-- Access Token + Refresh Token 방식
-- 자동 토큰 갱신
-- 로그아웃 시 토큰 제거
+- JWT-based token authentication
+- Access Token + Refresh Token approach
+- Automatic token refresh
+- Token removal on logout
 
-## 🎨 UI/UX 특징
+## 🎨 UI/UX Features
 
-- **Material Design**: Material Tailwind 기반 일관된 디자인
-- **반응형**: 다양한 화면 크기 지원
-- **다크 모드**: 사용자 선호도에 따른 테마 지원
-- **애니메이션**: Framer Motion을 활용한 부드러운 전환효과
-- **접근성**: ARIA 라벨 및 키보드 네비게이션 지원
+- **Material Design**: Consistent design based on Material Tailwind
+- **Responsive**: Support for various screen sizes
+- **Dark Mode**: Theme support based on user preference
+- **Animations**: Smooth transitions using Framer Motion
+- **Accessibility**: ARIA labels and keyboard navigation support
 
-## 🔄 API 연동
+## 🔄 API Integration
 
-백엔드 API와의 통신을 위한 주요 엔드포인트:
+Main endpoints for communication with backend API:
 
-- `GET /server/list` - 실행 중인 서버 목록
-- `POST /server/create-pod` - 새 서버 생성
-- `GET /server/my-server` - 내 서버 목록
-- `GET /server/my-pvcs` - PVC 목록
-- `GET /server/browse` - 파일 시스템 탐색
-- `GET /metrics/gpu-resource` - GPU 자원 모니터링
-- `GET /metrics/node-resource` - 노드 자원 정보
+- `GET /server/list` - List running servers
+- `POST /server/create-pod` - Create new server
+- `GET /server/my-server` - List my servers
+- `GET /server/my-pvcs` - List PVCs
+- `GET /server/browse` - File system exploration
+- `GET /metrics/gpu-resource` - GPU resource monitoring
+- `GET /metrics/node-resource` - Node resource information
 
-## 🐳 Docker 배포
+## 🐳 Docker Deployment
 
 ```bash
-# Docker 이미지 빌드
+# Build Docker image
 docker build -t gpu-dashboard-frontend .
 
-# 컨테이너 실행
+# Run container
 docker run -p 80:80 gpu-dashboard-frontend
 ```
 
-## 📄 라이센스
+## 📄 License
 
-이 프로젝트는 MIT 라이센스 하에 있습니다.
+This project is licensed under the MIT License.
 
-## 🤝 기여하기
+## 🤝 Contributing
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -167,6 +167,6 @@ docker run -p 80:80 gpu-dashboard-frontend
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📞 지원
+## 📞 Support
 
-문제가 발생하거나 질문이 있으시면 이슈를 생성해 주세요.
+If you encounter any issues or have questions, please create an issue.

@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
 data:
-  # API URL - 백엔드 서비스 URL
+  # API URL - Backend Service URL
   API_URL: {{ .Values.config.apiUrl | quote }}
 
   # Nginx configuration
@@ -33,7 +33,7 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # 모든 /proxy/ 요청을 WebSocket 지원으로 처리
+        # deal all /proxy/ requests with WebSocket support
         location /proxy/ {
             proxy_pass {{ .Values.config.backendServiceUrl }}/proxy/;
             proxy_http_version 1.1;

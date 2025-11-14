@@ -44,7 +44,7 @@ export function RunningPodTable() {
   const [tableRows, setTableRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 데이터를 불러오는 함수
+  // Function to fetch data
   const fetchTableData = async () => {
     try {
       // const response = await fetch("/api/gpu/table_info");
@@ -53,7 +53,7 @@ export function RunningPodTable() {
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
-      // 예: { data: [...] } 구조라면 setTableRows(result.data)
+      // Example: if structure is { data: [...] }, use setTableRows(result.data)
       setTableRows(result);
     } catch (error) {
       console.error("Error fetching table data:", error);
@@ -63,15 +63,15 @@ export function RunningPodTable() {
   };
 
   useEffect(() => {
-    // 마운트 시 즉시 호출
+    // Call immediately on mount
     fetchTableData();
 
-    // 15초 간격으로 폴링
+    // Polling every 60 seconds
     const interval = setInterval(() => {
       fetchTableData();
     }, 60000);
 
-    // 언마운트 시 interval 정리
+    // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, []);
   
@@ -97,7 +97,7 @@ export function RunningPodTable() {
 
   return (
     <Card className="max p-6 shadow-l shadow-blue-gray-900/5 border border-gray-300 rounded-xl bg-white">
-      {/* text-center 로 변경 */}
+      {/* Changed to text-center */}
       <h6 className="mb-2 text-slate-800 text-xl font-semibold">
         Running Servers
       </h6>
@@ -180,7 +180,7 @@ export function RunningPodTable() {
                 </td>
                 <td className={classes}>
                   <div className="flex items-center justify-center gap-2">
-                    {/* 가운데 정렬을 위해 justify-center 추가 */}
+                    {/* Added justify-center for center alignment */}
                     <IconButton variant="text" size="sm">
                       <ChartBarIcon className="h-4 w-4 text-gray-900" />
                     </IconButton>

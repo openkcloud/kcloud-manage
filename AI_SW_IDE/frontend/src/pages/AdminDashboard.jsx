@@ -55,7 +55,7 @@ const AdminDashboard = () => {
         <div className="flex flex-col flex-1 overflow-hidden">
           <StickyNavbar />
           <main className="p-6 overflow-auto">
-            <Outlet /> {/* 여기에 내부 페이지들이 렌더링됨 */}
+            <Outlet /> {/* Internal pages are rendered here */}
           </main>
         </div>
       </div>

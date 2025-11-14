@@ -4,7 +4,7 @@ metadata:
   name: gpu-dashboard-frontend-config
   namespace: gpu-dashboard
 data:
-  # API URL - 백엔드 서비스 URL
+  # API URL - Backend Service URL
   # API_URL: "http://gpu-dashboard-backend-service.gpu-dashboard.svc.cluster.local:8000"
   API_URL: "/api"
 
@@ -33,7 +33,7 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # 모든 /proxy/ 요청을 WebSocket 지원으로 처리
+        # Handle all /proxy/ requests with WebSocket support
         location /proxy/ {
             proxy_pass http://gpu-dashboard-backend-service.gpu-dashboard.svc.cluster.local:8000/proxy/;
             proxy_http_version 1.1;
