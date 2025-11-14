@@ -103,4 +103,4 @@ Each component is configured via environment variables:
 
 ## License
 
-Apache 2.0
+This project follows Apache 2.0 license
