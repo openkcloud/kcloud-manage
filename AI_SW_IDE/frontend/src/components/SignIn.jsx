@@ -88,10 +88,10 @@ export function SignInPage() {
           Welcome to
         </Typography>
         <Typography variant="h3" className="mb-2 text-4xl font-bold text-blue-700">
-          OKESTRO AI LAB
+          AI SOFTWARE IDE
         </Typography>
         <Typography variant="h3" className="mb-6 text-4xl font-bold text-blue-700">
-          DCP GPU Dashboard!
+          GPU Dashboard!
         </Typography>
         <Typography className="mb-20 text-white leading-loose">
           AI_SW_IDE는 사용 중인 GPU 자원을 실시간으로 모니터링하고, 사용 가능한 GPU 서버를 직접 배포하실 수 있는 웹 페이지입니다. 
