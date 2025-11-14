@@ -17,8 +17,8 @@ class PodCreateRequest(BaseModel):
 class NFSPVCCreateRequest(BaseModel):
     nfs_path: str
     pvc_name: str
-    nfs_server: Optional[str] = NFS_ADDRESS  # 기본 NFS 서버
-    storage_size: Optional[str] = "10Gi"  # 기본 스토리지 크기
+    nfs_server: Optional[str] = NFS_ADDRESS  # default NFS server
+    storage_size: Optional[str] = "10Gi"  # default storage size
 
 
 class EntireServerResponse(BaseModel):
